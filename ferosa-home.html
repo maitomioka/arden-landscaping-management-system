@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ferosa – Garden & Landscaping</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&family=Figtree:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          green: {
+            50:  '#f0fdf4',
+            100: '#dcfce7',
+            400: '#4ade80',
+            500: '#22c55e',
+            600: '#16a34a',
+            700: '#15803d',
+            800: '#166534',
+            900: '#14532d',
+            950: '#052e16',
+          }
+        },
+        fontFamily: {
+          display: ['"Cormorant Garamond"', 'serif'],
+          body: ['"Figtree"', 'sans-serif'],
+        }
+      }
+    }
+  }
+</script>
+<style>
+  * { font-family: 'Figtree', sans-serif; }
+  .font-display { font-family: 'Cormorant Garamond', serif; }
+
+  /* Smooth scroll */
+  html { scroll-behavior: smooth; }
+
+  /* Nav active */
+  .nav-active {
+    background: #dcfce7;
+    color: #15803d;
+    border-radius: 6px;
+    padding: 6px 14px;
+  }
+
+  /* Hero gradient placeholder */
+  .hero-placeholder {
+    background: linear-gradient(135deg, #064e3b 0%, #065f46 25%, #047857 50%, #059669 75%, #064e3b 100%);
+  }
+
+  /* Card hover */
+  .service-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.12); }
+  .service-card { transition: all 0.3s ease; }
+
+  /* Tool card hover */
+  .tool-card:hover { background: #f0fdf4; border-color: #22c55e; }
+  .tool-card { transition: all 0.25s ease; }
+
+  /* Button hover */
+  .btn-green:hover { background: #15803d; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(34,197,94,0.35); }
+  .btn-green { transition: all 0.2s ease; }
+  .btn-outline:hover { background: rgba(255,255,255,0.15); transform: translateY(-1px); }
+  .btn-outline { transition: all 0.2s ease; }
+
+  /* Testimonial dots */
+  .dot { width: 28px; height: 6px; border-radius: 3px; background: #d1d5db; transition: background 0.2s; }
+  .dot.active { background: #22c55e; }
+
+  /* Mobile menu */
+  #mobile-menu { display: none; }
+  #mobile-menu.open { display: block; }
+
+  /* Stat counter animation */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-in { animation: fadeInUp 0.6s ease both; }
+
+  /* Hero text */
+  .hero-garden {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 700;
+    color: #4ade80;
+    font-size: clamp(3rem, 8vw, 6rem);
+    line-height: 1;
+  }
+
+  /* CTA bg */
+  .cta-bg {
+    background: linear-gradient(135deg, #15803d 0%, #16a34a 40%, #22c55e 70%, #15803d 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 80% at 50% 50%, rgba(255,255,255,0.06) 0%, transparent 70%);
+  }
+
+  /* Footer */
+  .footer-bg { background: #052e16; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #f0fdf4; }
+  ::-webkit-scrollbar-thumb { background: #22c55e; border-radius: 3px; }
+</style>
+</head>
+<body class="bg-white text-gray-900">
+
+<!-- ═══════════════════════════════════════════════
+     NAVIGATION
+═══════════════════════════════════════════════ -->
+<nav class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+
+      <!-- Logo -->
+      <div class="flex items-center gap-2.5 flex-shrink-0">
+        <div class="w-9 h-9 bg-green-600 rounded-xl flex items-center justify-center shadow-md">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M12 3C12 3 7 6.5 7 12c0 2.76 1.34 5.22 3.4 6.74.38-.48.93-.74 1.6-.74s1.22.26 1.6.74C15.66 17.22 17 14.76 17 12c0-5.5-5-9-5-9z" fill="white"/>
+            <path d="M12 3c0 0 0 4 2.5 7" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="text-xl font-bold text-gray-900 tracking-tight">Ferosa</span>
+      </div>
+
+      <!-- Desktop Nav -->
+      <div class="hidden lg:flex items-center gap-1">
+        <a href="#" class="nav-active text-sm font-semibold">Home</a>
+        <a href="#services" class="text-sm font-medium text-gray-600 hover:text-green-600 px-3 py-1.5 rounded-md transition-colors">Services</a>
+        <a href="#" class="text-sm font-medium text-gray-600 hover:text-green-600 px-3 py-1.5 rounded-md transition-colors">Customize Garden</a>
+        <a href="#" class="text-sm font-medium text-gray-600 hover:text-green-600 px-3 py-1.5 rounded-md transition-colors">Shop</a>
+        <a href="#" class="text-sm font-medium text-gray-600 hover:text-green-600 px-3 py-1.5 rounded-md transition-colors">Orders</a>
+        <a href="#" class="text-sm font-medium text-gray-600 hover:text-green-600 px-3 py-1.5 rounded-md transition-colors">Schedule</a>
+        <a href="#" class="text-sm font-medium text-gray-600 hover:text-green-600 px-3 py-1.5 rounded-md transition-colors">Account</a>
+        <a href="#" class="text-sm font-semibold text-yellow-700 hover:text-yellow-600 px-3 py-1.5 rounded-md transition-colors">Admin</a>
+      </div>
+
+      <!-- Right Icons -->
+      <div class="hidden lg:flex items-center gap-4">
+        <!-- Search -->
+        <button class="text-gray-500 hover:text-green-600 transition-colors">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </button>
+        <!-- Bell -->
+        <button class="relative text-gray-500 hover:text-green-600 transition-colors">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-white"></span>
+        </button>
+        <!-- Cart -->
+        <button class="relative text-gray-500 hover:text-green-600 transition-colors">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span class="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 bg-green-600 text-white text-xs font-bold rounded-full w-[18px] h-[18px] flex items-center justify-center text-[10px]">3</span>
+        </button>
+        <!-- User -->
+        <button class="text-gray-500 hover:text-green-600 transition-colors">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </button>
+      </div>
+
+      <!-- Mobile hamburger -->
+      <button id="hamburger" class="lg:hidden text-gray-600 hover:text-green-600" onclick="document.getElementById('mobile-menu').classList.toggle('open')">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="lg:hidden bg-white border-t border-gray-100 px-4 py-3">
+    <div class="flex flex-col gap-1">
+      <a href="#" class="text-sm font-semibold text-green-700 bg-green-50 px-3 py-2 rounded-md">Home</a>
+      <a href="#services" class="text-sm font-medium text-gray-600 px-3 py-2 rounded-md hover:bg-gray-50">Services</a>
+      <a href="#" class="text-sm font-medium text-gray-600 px-3 py-2 rounded-md hover:bg-gray-50">Customize Garden</a>
+      <a href="#" class="text-sm font-medium text-gray-600 px-3 py-2 rounded-md hover:bg-gray-50">Shop</a>
+      <a href="#" class="text-sm font-medium text-gray-600 px-3 py-2 rounded-md hover:bg-gray-50">Orders</a>
+      <a href="#" class="text-sm font-medium text-gray-600 px-3 py-2 rounded-md hover:bg-gray-50">Schedule</a>
+      <a href="#" class="text-sm font-medium text-gray-600 px-3 py-2 rounded-md hover:bg-gray-50">Account</a>
+      <a href="#" class="text-sm font-semibold text-yellow-700 px-3 py-2 rounded-md hover:bg-gray-50">Admin</a>
+    </div>
+  </div>
+</nav>
+
+
+<!-- ═══════════════════════════════════════════════
+     HERO SECTION — 3-Slide Carousel
+═══════════════════════════════════════════════ -->
+<section class="relative pt-16 h-screen min-h-[600px] max-h-[900px] overflow-hidden" id="hero">
+
+  <!-- ── SLIDES TRACK ── -->
+  <div id="slides-track" class="absolute inset-0 flex transition-transform duration-700 ease-in-out" style="width:300%">
+
+    <!-- ─── SLIDE 1: Design Your Dream Garden ─── -->
+    <!-- REPLACE WITH OFFICIAL IMAGE: luxurious pond garden with pathways, palms & house aerial view -->
+    <div class="relative flex-none overflow-hidden" style="width:33.3333%">
+      <div class="absolute inset-0" style="background:linear-gradient(135deg,#064e3b 0%,#065f46 20%,#047857 50%,#059669 80%,#064e3b 100%)">
+        <div class="absolute inset-0 flex items-center justify-center opacity-20">
+          <span class="text-white text-xs font-mono tracking-widest border border-white/40 px-4 py-2 rounded text-center max-w-xs">SLIDE 1 BG — Replace with pond garden aerial photo</span>
+        </div>
+      </div>
+      <div class="absolute inset-0 bg-gradient-to-r from-black/65 via-black/30 to-transparent"></div>
+      <div class="relative z-10 h-full flex flex-col justify-center px-6 sm:px-10 lg:px-20 max-w-3xl">
+        <div class="inline-flex items-center gap-2 bg-green-600/90 text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-full mb-6 w-fit">
+          <span class="w-2 h-2 bg-green-300 rounded-full animate-pulse"></span>
+          Now booking for Spring 2026
+        </div>
+        <h1 class="text-white font-bold leading-tight mb-4">
+          <span class="block text-4xl sm:text-5xl lg:text-6xl font-display font-bold">Design Your Dream</span>
+          <span class="hero-garden block">Garden</span>
+        </h1>
+        <p class="text-white/85 text-base sm:text-lg mb-8 max-w-md leading-relaxed">From concept to creation, we bring your vision to life</p>
+        <div class="flex flex-wrap gap-3 sm:gap-4">
+          <button class="btn-green bg-green-500 text-white font-semibold px-6 py-3 rounded-xl flex items-center gap-2 text-sm sm:text-base shadow-lg">
+            Customize Your Garden
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+          <button class="btn-outline border-2 border-white/70 text-white font-semibold px-6 py-3 rounded-xl text-sm sm:text-base backdrop-blur-sm">Browse Inventory</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── SLIDE 2: Transform Your Space with Ferosa ─── -->
+    <!-- REPLACE WITH OFFICIAL IMAGE: autumn garden with bare branchy trees, trimmed hedges, stone wall -->
+    <div class="relative flex-none overflow-hidden" style="width:33.3333%">
+      <div class="absolute inset-0" style="background:linear-gradient(135deg,#1a2e1a 0%,#2d5a2d 30%,#4a7a3a 60%,#3a6a2a 100%)">
+        <div class="absolute inset-0 flex items-center justify-center opacity-20">
+          <span class="text-white text-xs font-mono tracking-widest border border-white/40 px-4 py-2 rounded text-center max-w-xs">SLIDE 2 BG — Replace with autumn garden, bare trees & trimmed hedges photo</span>
+        </div>
+      </div>
+      <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/25 to-transparent"></div>
+      <div class="relative z-10 h-full flex flex-col justify-center px-6 sm:px-10 lg:px-20 max-w-3xl">
+        <div class="inline-flex items-center gap-2 bg-green-600/90 text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-full mb-6 w-fit">
+          <span class="w-2 h-2 bg-green-300 rounded-full animate-pulse"></span>
+          Now booking for Spring 2026
+        </div>
+        <h1 class="text-white font-bold leading-tight mb-4">
+          <span class="block text-4xl sm:text-5xl lg:text-6xl font-display font-bold">Transform Your Space</span>
+          <span class="hero-garden block">with Ferosa</span>
+        </h1>
+        <p class="text-white/85 text-base sm:text-lg mb-8 max-w-md leading-relaxed">Expert Garden & Landscaping Services</p>
+        <div class="flex flex-wrap gap-3 sm:gap-4">
+          <button class="btn-green bg-green-500 text-white font-semibold px-6 py-3 rounded-xl flex items-center gap-2 text-sm sm:text-base shadow-lg">
+            Customize Your Garden
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+          <button class="btn-outline border-2 border-white/70 text-white font-semibold px-6 py-3 rounded-xl text-sm sm:text-base backdrop-blur-sm">Browse Inventory</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── SLIDE 3: Premium Outdoor Living ─── -->
+    <!-- REPLACE WITH OFFICIAL IMAGE: aerial view of luxury curved swimming pool with palms -->
+    <div class="relative flex-none overflow-hidden" style="width:33.3333%">
+      <div class="absolute inset-0" style="background:linear-gradient(135deg,#0f3a2e 0%,#1a5c45 30%,#2d8a6a 60%,#3aaa80 100%)">
+        <div class="absolute inset-0 flex items-center justify-center opacity-20">
+          <span class="text-white text-xs font-mono tracking-widest border border-white/40 px-4 py-2 rounded text-center max-w-xs">SLIDE 3 BG — Replace with aerial luxury curved pool & palm trees photo</span>
+        </div>
+      </div>
+      <div class="absolute inset-0 bg-gradient-to-r from-black/65 via-black/30 to-transparent"></div>
+      <div class="relative z-10 h-full flex flex-col justify-center px-6 sm:px-10 lg:px-20 max-w-3xl">
+        <div class="inline-flex items-center gap-2 bg-green-600/90 text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-full mb-6 w-fit">
+          <span class="w-2 h-2 bg-green-300 rounded-full animate-pulse"></span>
+          Now booking for Spring 2026
+        </div>
+        <h1 class="text-white font-bold leading-tight mb-4">
+          <span class="block text-4xl sm:text-5xl lg:text-6xl font-display font-bold">Premium Outdoor</span>
+          <span class="hero-garden block">Living</span>
+        </h1>
+        <p class="text-white/85 text-base sm:text-lg mb-8 max-w-md leading-relaxed">Create stunning landscapes that elevate your lifestyle</p>
+        <div class="flex flex-wrap gap-3 sm:gap-4">
+          <button class="btn-green bg-green-500 text-white font-semibold px-6 py-3 rounded-xl flex items-center gap-2 text-sm sm:text-base shadow-lg">
+            Customize Your Garden
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+          <button class="btn-outline border-2 border-white/70 text-white font-semibold px-6 py-3 rounded-xl text-sm sm:text-base backdrop-blur-sm">Browse Inventory</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /slides-track -->
+
+  <!-- Prev / Next arrows -->
+  <button id="hero-prev" class="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/20 hover:bg-white/35 backdrop-blur-sm border border-white/30 rounded-full flex items-center justify-center text-white transition-all">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+  </button>
+  <button id="hero-next" class="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/20 hover:bg-white/35 backdrop-blur-sm border border-white/30 rounded-full flex items-center justify-center text-white transition-all">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+  </button>
+
+  <!-- Dots -->
+  <div id="hero-dots" class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+    <div class="hero-dot dot"></div>
+    <div class="hero-dot dot active"></div>
+    <div class="hero-dot dot"></div>
+  </div>
+
+</section>
+
+
+<!-- ═══════════════════════════════════════════════
+     STATS BAR
+═══════════════════════════════════════════════ -->
+<section class="bg-green-600 py-8 sm:py-10">
+  <div class="max-w-5xl mx-auto px-6">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+      <div>
+        <p class="text-white text-3xl sm:text-4xl font-bold font-display">2,500+</p>
+        <p class="text-green-100 text-sm mt-1 font-medium">Projects Completed</p>
+      </div>
+      <div>
+        <p class="text-white text-3xl sm:text-4xl font-bold font-display">98%</p>
+        <p class="text-green-100 text-sm mt-1 font-medium">Client Satisfaction</p>
+      </div>
+      <div>
+        <p class="text-white text-3xl sm:text-4xl font-bold font-display">150+</p>
+        <p class="text-green-100 text-sm mt-1 font-medium">Plant Varieties</p>
+      </div>
+      <div>
+        <p class="text-white text-3xl sm:text-4xl font-bold font-display">10+</p>
+        <p class="text-green-100 text-sm mt-1 font-medium">Years Experience</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════
+     FEATURED SERVICES
+═══════════════════════════════════════════════ -->
+<section id="services" class="py-16 sm:py-20 bg-white">
+  <div class="max-w-7xl mx-auto px-6">
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <p class="text-green-600 text-xs font-bold tracking-[0.2em] uppercase mb-3">What We Offer</p>
+      <h2 class="text-3xl sm:text-4xl font-bold font-display text-gray-900 mb-4">Featured Services</h2>
+      <p class="text-gray-500 text-base max-w-lg mx-auto leading-relaxed">
+        From design to maintenance, we provide comprehensive<br class="hidden sm:block"> landscaping solutions tailored to your needs.
+      </p>
+    </div>
+
+    <!-- Service Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+      <!-- Card 1: Lawn Care -->
+      <div class="service-card rounded-2xl overflow-hidden border border-gray-100 bg-white shadow-sm">
+        <!-- REPLACE WITH OFFICIAL IMAGE -->
+        <div class="bg-green-200 h-48 flex items-center justify-center relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-green-300 to-green-500 opacity-60"></div>
+          <span class="relative text-green-900/70 text-xs font-mono text-center px-3 leading-relaxed">SERVICE IMAGE<br>Replace with Lawn Care photo</span>
+        </div>
+        <div class="p-5">
+          <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center mb-3">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg>
+          </div>
+          <h3 class="font-bold text-gray-900 text-base mb-2">Lawn Care</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">Professional mowing, edging, and fertilization to keep your lawn pristine year-round.</p>
+        </div>
+      </div>
+
+      <!-- Card 2: Plant Installation -->
+      <div class="service-card rounded-2xl overflow-hidden border border-gray-100 bg-white shadow-sm">
+        <!-- REPLACE WITH OFFICIAL IMAGE -->
+        <div class="bg-emerald-200 h-48 flex items-center justify-center relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-emerald-300 to-green-600 opacity-60"></div>
+          <span class="relative text-green-900/70 text-xs font-mono text-center px-3 leading-relaxed">SERVICE IMAGE<br>Replace with Plant Installation photo</span>
+        </div>
+        <div class="p-5">
+          <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center mb-3">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M12 2a9 9 0 0 1 9 9c0 6-9 13-9 13S3 17 3 11a9 9 0 0 1 9-9z"/><circle cx="12" cy="11" r="3"/></svg>
+          </div>
+          <h3 class="font-bold text-gray-900 text-base mb-2">Plant Installation</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">Expert selection and planting of trees, shrubs, and flowers for vibrant gardens.</p>
+        </div>
+      </div>
+
+      <!-- Card 3: Hardscaping -->
+      <div class="service-card rounded-2xl overflow-hidden border border-gray-100 bg-white shadow-sm">
+        <!-- REPLACE WITH OFFICIAL IMAGE -->
+        <div class="bg-lime-200 h-48 flex items-center justify-center relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-lime-300 to-green-500 opacity-60"></div>
+          <span class="relative text-green-900/70 text-xs font-mono text-center px-3 leading-relaxed">SERVICE IMAGE<br>Replace with Hardscaping photo</span>
+        </div>
+        <div class="p-5">
+          <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center mb-3">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          </div>
+          <h3 class="font-bold text-gray-900 text-base mb-2">Hardscaping</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">Beautiful patios, walkways, and retaining walls built to last with premium materials.</p>
+        </div>
+      </div>
+
+      <!-- Card 4: Irrigation -->
+      <div class="service-card rounded-2xl overflow-hidden border border-gray-100 bg-white shadow-sm">
+        <!-- REPLACE WITH OFFICIAL IMAGE -->
+        <div class="bg-teal-200 h-48 flex items-center justify-center relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-teal-300 to-green-600 opacity-60"></div>
+          <span class="relative text-green-900/70 text-xs font-mono text-center px-3 leading-relaxed">SERVICE IMAGE<br>Replace with Irrigation photo</span>
+        </div>
+        <div class="p-5">
+          <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center mb-3">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3z"/></svg>
+          </div>
+          <h3 class="font-bold text-gray-900 text-base mb-2">Irrigation</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">Smart watering systems designed for efficiency, sustainability, and healthy plant growth.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- View All button -->
+    <div class="text-center mt-10">
+      <button class="btn-green bg-green-600 text-white font-semibold px-8 py-3.5 rounded-full flex items-center gap-2 mx-auto shadow-md text-sm sm:text-base">
+        View All Services
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════
+     QUICK TOOLS
+═══════════════════════════════════════════════ -->
+<section class="bg-gray-50 py-12 sm:py-16">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+      <!-- Cost Estimator -->
+      <div class="tool-card bg-white border border-gray-200 rounded-2xl p-6 flex items-center gap-4 cursor-pointer shadow-sm">
+        <div class="w-14 h-14 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.8">
+            <rect x="4" y="2" width="16" height="20" rx="2"/>
+            <line x1="8" y1="6" x2="16" y2="6"/>
+            <line x1="8" y1="10" x2="16" y2="10"/>
+            <line x1="8" y1="14" x2="12" y2="14"/>
+          </svg>
+        </div>
+        <div class="flex-1">
+          <h3 class="font-bold text-gray-900 text-base">Cost Estimator</h3>
+          <p class="text-gray-500 text-sm mt-0.5">Get instant project cost estimates</p>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </div>
+
+      <!-- Schedule Service -->
+      <div class="tool-card bg-white border border-gray-200 rounded-2xl p-6 flex items-center gap-4 cursor-pointer shadow-sm">
+        <div class="w-14 h-14 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.8">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <div class="flex-1">
+          <h3 class="font-bold text-gray-900 text-base">Schedule Service</h3>
+          <p class="text-gray-500 text-sm mt-0.5">Book your next appointment</p>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </div>
+
+      <!-- Track Delivery -->
+      <div class="tool-card bg-white border border-gray-200 rounded-2xl p-6 flex items-center gap-4 cursor-pointer shadow-sm">
+        <div class="w-14 h-14 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.8">
+            <rect x="1" y="3" width="15" height="13" rx="1"/>
+            <path d="M16 8h4l3 3v5h-7V8z"/>
+            <circle cx="5.5" cy="18.5" r="2.5"/>
+            <circle cx="18.5" cy="18.5" r="2.5"/>
+          </svg>
+        </div>
+        <div class="flex-1">
+          <h3 class="font-bold text-gray-900 text-base">Track Delivery</h3>
+          <p class="text-gray-500 text-sm mt-0.5">Real-time order tracking</p>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════
+     TESTIMONIALS
+═══════════════════════════════════════════════ -->
+<section id="testimonials" class="py-16 sm:py-20 bg-white">
+  <div class="max-w-3xl mx-auto px-6">
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <p class="text-green-600 text-xs font-bold tracking-[0.2em] uppercase mb-3">Testimonials</p>
+      <h2 class="text-3xl sm:text-4xl font-bold font-display text-gray-900">What Our Clients Say</h2>
+    </div>
+
+    <!-- Testimonial Card -->
+    <div class="bg-gray-50 rounded-3xl p-8 sm:p-10 relative">
+      <!-- Quote marks -->
+      <div class="text-green-100 font-display text-8xl leading-none absolute top-6 left-8 select-none">"</div>
+
+      <!-- Stars -->
+      <div class="flex justify-center gap-1 mb-6 relative z-10">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+
+      <!-- Quote text -->
+      <blockquote id="t-quote" class="text-gray-700 text-center text-base sm:text-lg leading-relaxed mb-8 relative z-10 max-w-xl mx-auto">
+        "Ferosa completely transformed our backyard. The garden design was beyond what we imagined, and the team was professional from start to finish."
+      </blockquote>
+
+      <!-- Author -->
+      <div class="flex flex-col items-center gap-2">
+        <div id="t-initial" class="w-12 h-12 bg-green-700 rounded-full flex items-center justify-center text-white font-bold text-lg">S</div>
+        <div class="text-center">
+          <p id="t-name" class="font-bold text-gray-900">Sarah Mitchell</p>
+          <p id="t-role" class="text-gray-500 text-sm">Homeowner</p>
+        </div>
+      </div>
+
+      <!-- Carousel dots -->
+      <div class="flex justify-center gap-2 mt-8">
+        <div class="t-dot dot active w-7"></div>
+        <div class="t-dot dot"></div>
+        <div class="t-dot dot"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════
+     CTA SECTION
+═══════════════════════════════════════════════ -->
+<section class="cta-bg py-20 sm:py-24 relative">
+  <!-- REPLACE WITH OFFICIAL IMAGE -->
+  <!-- CTA overlay placeholder note (hidden visually, for devs) -->
+  <!-- CTA BACKGROUND — Replace with soft floral/garden overlay image -->
+
+  <div class="relative z-10 max-w-3xl mx-auto px-6 text-center">
+    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold font-display text-white mb-5 leading-tight">
+      Ready to Transform Your Outdoor Space?
+    </h2>
+    <p class="text-white/85 text-base sm:text-lg mb-10 max-w-xl mx-auto leading-relaxed">
+      Get started with a free consultation and custom garden design<br class="hidden sm:block"> tailored to your vision and budget.
+    </p>
+    <div class="flex flex-wrap gap-4 justify-center">
+      <button class="bg-white text-green-700 font-bold px-8 py-3.5 rounded-full text-sm sm:text-base shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
+        Start Designing Now
+      </button>
+      <button class="border-2 border-white text-white font-bold px-8 py-3.5 rounded-full text-sm sm:text-base hover:bg-white/15 transition-all">
+        Book Consultation
+      </button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════ -->
+<footer class="footer-bg text-gray-300">
+  <div class="max-w-7xl mx-auto px-6 py-14 sm:py-16">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+
+      <!-- Brand column -->
+      <div>
+        <div class="flex items-center gap-2.5 mb-4">
+          <div class="w-9 h-9 bg-green-600 rounded-xl flex items-center justify-center shadow-md">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3C12 3 7 6.5 7 12c0 2.76 1.34 5.22 3.4 6.74.38-.48.93-.74 1.6-.74s1.22.26 1.6.74C15.66 17.22 17 14.76 17 12c0-5.5-5-9-5-9z" fill="white"/>
+            </svg>
+          </div>
+          <span class="text-xl font-bold text-white">Ferosa</span>
+        </div>
+        <p class="text-gray-400 text-sm leading-relaxed mb-6 max-w-xs">
+          Expert garden & landscaping services transforming outdoor spaces into beautiful, sustainable environments since 2015.
+        </p>
+        <!-- Social icons -->
+        <div class="flex gap-3">
+          <a href="#" class="w-9 h-9 bg-white/10 hover:bg-green-600 rounded-lg flex items-center justify-center transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          </a>
+          <a href="#" class="w-9 h-9 bg-white/10 hover:bg-green-600 rounded-lg flex items-center justify-center transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+          <a href="#" class="w-9 h-9 bg-white/10 hover:bg-green-600 rounded-lg flex items-center justify-center transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+          </a>
+          <a href="#" class="w-9 h-9 bg-white/10 hover:bg-green-600 rounded-lg flex items-center justify-center transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-1.96C18.88 4 12 4 12 4s-6.88 0-8.6.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.94 1.95C5.12 20 12 20 12 20s6.88 0 8.6-.47a2.78 2.78 0 0 0 1.94-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#052e16"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div>
+        <h4 class="text-white font-bold text-sm uppercase tracking-widest mb-5">Quick Links</h4>
+        <ul class="space-y-2.5">
+          <li><a href="#" class="text-gray-400 text-sm hover:text-white transition-colors">Home</a></li>
+          <li><a href="#services" class="text-gray-400 text-sm hover:text-white transition-colors">Services</a></li>
+          <li><a href="#" class="text-gray-400 text-sm hover:text-white transition-colors">Customize Garden</a></li>
+          <li><a href="#" class="text-gray-400 text-sm hover:text-white transition-colors">Shop</a></li>
+          <li><a href="#" class="text-gray-400 text-sm hover:text-white transition-colors">Schedule</a></li>
+          <li><a href="#" class="text-gray-400 text-sm hover:text-white transition-colors">Cost Estimator</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact -->
+      <div>
+        <h4 class="text-white font-bold text-sm uppercase tracking-widest mb-5">Contact Us</h4>
+        <ul class="space-y-3.5">
+          <li class="flex items-start gap-3">
+            <svg class="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span class="text-gray-400 text-sm leading-relaxed">A. Arellano Ave. Mulawin, Orani, Bataan, Philippines, 2112</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <svg class="flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.99 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.9 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span class="text-gray-400 text-sm">(555) 123-4567</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <svg class="flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            <span class="text-gray-400 text-sm">hello@ferosa.com</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Newsletter -->
+      <div>
+        <h4 class="text-white font-bold text-sm uppercase tracking-widest mb-5">Newsletter</h4>
+        <p class="text-gray-400 text-sm leading-relaxed mb-5">Get gardening tips and exclusive offers delivered to your inbox.</p>
+        <div class="flex gap-2">
+          <input
+            type="email"
+            placeholder="Your email"
+            class="flex-1 bg-white/10 border border-white/15 text-white placeholder-gray-500 text-sm px-4 py-2.5 rounded-xl outline-none focus:border-green-500 focus:bg-white/15 transition-all"
+          >
+          <button class="bg-green-600 hover:bg-green-500 text-white font-semibold text-sm px-4 py-2.5 rounded-xl transition-colors flex-shrink-0">
+            Join
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="border-t border-white/10">
+    <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p class="text-gray-500 text-sm">© 2026 Ferosa Garden & Landscaping. All rights reserved.</p>
+      <div class="flex gap-5">
+        <a href="#" class="text-gray-500 text-sm hover:text-white transition-colors">Privacy Policy</a>
+        <a href="#" class="text-gray-500 text-sm hover:text-white transition-colors">Terms of Service</a>
+        <a href="#" class="text-gray-500 text-sm hover:text-white transition-colors">Sitemap</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Help badge -->
+<div class="fixed bottom-6 right-6 z-50 w-10 h-10 bg-gray-900 hover:bg-green-700 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-lg cursor-pointer transition-colors">?</div>
+
+<script>
+  // ── Mobile menu ──
+  document.querySelectorAll('#mobile-menu a').forEach(a => {
+    a.addEventListener('click', () => document.getElementById('mobile-menu').classList.remove('open'));
+  });
+
+  // ── Hero Carousel ──
+  const TOTAL = 3;
+  // Start at slide 0 (index 0 = first slide, active dot = slide 1 per reference)
+  let current = 0;
+  const track = document.getElementById('slides-track');
+  const dots  = document.querySelectorAll('.hero-dot');
+
+  function goTo(idx) {
+    current = (idx + TOTAL) % TOTAL;
+    track.style.transform = `translateX(-${current * (100 / 3)}%)`;
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+  }
+
+  document.getElementById('hero-prev').addEventListener('click', () => goTo(current - 1));
+  document.getElementById('hero-next').addEventListener('click', () => goTo(current + 1));
+  dots.forEach((d, i) => { d.style.cursor = 'pointer'; d.addEventListener('click', () => goTo(i)); });
+
+  // Auto-advance every 5s
+  let autoplay = setInterval(() => goTo(current + 1), 5000);
+  document.getElementById('hero').addEventListener('mouseenter', () => clearInterval(autoplay));
+  document.getElementById('hero').addEventListener('mouseleave', () => { autoplay = setInterval(() => goTo(current + 1), 5000); });
+
+  // Start on slide 0
+  goTo(0);
+
+  // ── Testimonial carousel ──
+  const testimonials = [
+    { text: '"Ferosa completely transformed our backyard. The garden design was beyond what we imagined, and the team was professional from start to finish."', name: 'Sarah Mitchell', role: 'Homeowner', initial: 'S' },
+    { text: '"From the very first consultation, Ferosa understood exactly what we wanted. Our garden is now the envy of the neighborhood!"',                    name: 'James Parker',   role: 'Property Owner', initial: 'J' },
+    { text: '"The irrigation system they installed has cut our water bill in half. Highly recommend their services to anyone serious about their garden."',     name: 'Linda Torres',   role: 'Homeowner',      initial: 'L' },
+  ];
+  let tIdx = 0;
+
+  function renderTestimonial(i) {
+    const t = testimonials[i];
+    document.getElementById('t-quote').textContent   = t.text;
+    document.getElementById('t-name').textContent    = t.name;
+    document.getElementById('t-role').textContent    = t.role;
+    document.getElementById('t-initial').textContent = t.initial;
+    document.querySelectorAll('.t-dot').forEach((d, j) => d.classList.toggle('active', j === i));
+  }
+
+  document.querySelectorAll('.t-dot').forEach((d, i) => {
+    d.style.cursor = 'pointer';
+    d.addEventListener('click', () => { tIdx = i; renderTestimonial(i); });
+  });
+</script>
+</body>
+</html>

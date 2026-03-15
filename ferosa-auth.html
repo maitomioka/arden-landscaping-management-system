@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ferosa – Garden & Landscaping</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green: #22c55e;
+  --green-dark: #16a34a;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Figtree', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ── Fullscreen background ── */
+.scene-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  transform: scale(1.06);
+  transition: transform 0.1s linear;
+  will-change: transform;
+  overflow: hidden;
+}
+
+.scene-overlay {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    155deg,
+    rgba(255,248,240,0.15) 0%,
+    rgba(240,255,244,0.10) 40%,
+    rgba(10,30,10,0.28) 100%
+  );
+  z-index: 1;
+}
+
+/* ── Brand bottom-left ── */
+.brand {
+  position: fixed;
+  bottom: 38px;
+  left: 42px;
+  z-index: 20;
+  animation: fadeUp 0.9s ease 0.3s both;
+}
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 11px;
+}
+.brand-icon {
+  width: 36px; height: 36px;
+  background: var(--green);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(34,197,94,0.5);
+  flex-shrink: 0;
+}
+.brand-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 23px; font-weight: 700;
+  color: white;
+  text-shadow: 0 1px 10px rgba(0,0,0,0.35);
+  letter-spacing: 0.5px;
+}
+.brand-slogan {
+  font-size: 14.5px; font-weight: 600;
+  color: rgba(255,255,255,0.95);
+  text-shadow: 0 1px 10px rgba(0,0,0,0.4);
+  max-width: 310px; line-height: 1.45;
+  margin-bottom: 7px;
+}
+.brand-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.65);
+  text-shadow: 0 1px 8px rgba(0,0,0,0.4);
+  max-width: 290px; line-height: 1.6;
+}
+
+/* ── Help badge ── */
+.help-badge {
+  position: fixed;
+  bottom: 28px; right: 28px;
+  z-index: 20;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: rgba(17,24,39,0.65);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: white;
+  font-size: 15px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+
+/* ── Scene wrapper ── */
+.scene {
+  position: relative;
+  z-index: 5;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+}
+
+/* ── Glass form card ── */
+.form-card {
+  width: 100%;
+  max-width: 452px;
+  background: rgba(255,255,255,0.74);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 28px;
+  padding: 44px 40px 38px;
+  box-shadow:
+    0 10px 50px rgba(0,0,0,0.16),
+    0 2px 14px rgba(0,0,0,0.07),
+    inset 0 1px 0 rgba(255,255,255,0.85);
+}
+
+/* ── Page switch animations ── */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(22px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes fadeDown {
+  from { opacity:1; transform:translateY(0); }
+  to   { opacity:0; transform:translateY(-14px); }
+}
+
+.page { display:none; }
+.page.active { display:flex; align-items:center; justify-content:center; }
+.page.active .form-card { animation: fadeUp 0.55s cubic-bezier(0.22,1,0.36,1) both; }
+
+/* ── Form header ── */
+.form-header { text-align:center; margin-bottom:26px; }
+.form-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px; font-weight: 700;
+  color: #111827; line-height: 1.15;
+  margin-bottom: 7px;
+}
+.form-subtitle { font-size: 14px; color: #4b5563; }
+
+/* ── Social buttons ── */
+.social-row { display:flex; gap:9px; margin-bottom:18px; }
+.social-btn {
+  flex:1;
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  padding:11px 6px;
+  border: 1.5px solid rgba(0,0,0,0.1);
+  border-radius:12px;
+  background: rgba(255,255,255,0.9);
+  font-family:'Figtree',sans-serif;
+  font-size:13px; font-weight:500;
+  color:#111827; cursor:pointer;
+  transition: all 0.18s;
+}
+.social-btn:hover {
+  background:white;
+  border-color:rgba(0,0,0,0.18);
+  transform:translateY(-1px);
+  box-shadow:0 4px 14px rgba(0,0,0,0.1);
+}
+
+/* ── Divider ── */
+.divider {
+  display:flex; align-items:center; gap:11px;
+  margin-bottom:18px;
+  font-size:12px; color:#9ca3af; font-weight:500; letter-spacing:0.3px;
+}
+.divider::before,.divider::after {
+  content:''; flex:1; height:1px; background:rgba(0,0,0,0.1);
+}
+
+/* ── Fields ── */
+.field { margin-bottom:13px; }
+.field-label {
+  display:block; font-size:12.5px; font-weight:600;
+  color:#374151; margin-bottom:6px; letter-spacing:0.2px;
+}
+.field-label-row {
+  display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;
+}
+.forgot-link {
+  font-size:12.5px; color:var(--green-dark); font-weight:600;
+  cursor:pointer; text-decoration:none;
+}
+.forgot-link:hover { text-decoration:underline; }
+
+.input-wrap { position:relative; display:flex; align-items:center; }
+.input-icon {
+  position:absolute; left:13px; color:#9ca3af;
+  display:flex; align-items:center; pointer-events:none;
+}
+.input-eye {
+  position:absolute; right:13px; color:#9ca3af;
+  cursor:pointer; display:flex; align-items:center;
+}
+.field input {
+  width:100%; padding:12px 13px 12px 38px;
+  border:1.5px solid rgba(0,0,0,0.1);
+  border-radius:12px;
+  background:rgba(255,255,255,0.88);
+  font-family:'Figtree',sans-serif;
+  font-size:14px; color:#111827; outline:none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.field input::placeholder { color:#9ca3af; }
+.field input:focus {
+  border-color:var(--green);
+  background:white;
+  box-shadow:0 0 0 3px rgba(34,197,94,0.14);
+}
+.has-eye input { padding-right:38px; }
+
+/* ── Account type ── */
+.acct-label {
+  display:block; font-size:12.5px; font-weight:600;
+  color:#374151; margin-bottom:8px;
+}
+.acct-row { display:flex; gap:10px; margin-bottom:20px; }
+.acct-btn {
+  flex:1; padding:13px 10px;
+  border:1.5px solid rgba(0,0,0,0.1);
+  border-radius:13px;
+  background:rgba(255,255,255,0.88);
+  text-align:left; cursor:pointer;
+  transition:all 0.2s; font-family:'Figtree',sans-serif;
+}
+.acct-btn .aname { font-size:14px; font-weight:600; color:#111827; display:block; margin-bottom:2px; }
+.acct-btn .adesc { font-size:11.5px; color:#6b7280; }
+.acct-btn.selected { border-color:var(--green); background:rgba(220,252,231,0.72); }
+.acct-btn.selected .aname { color:var(--green-dark); }
+
+/* ── CTA ── */
+.cta-btn {
+  width:100%; padding:15px;
+  background:var(--green); color:white; border:none;
+  border-radius:14px; font-family:'Figtree',sans-serif;
+  font-size:15px; font-weight:700;
+  cursor:pointer; letter-spacing:0.2px;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  box-shadow:0 4px 20px rgba(34,197,94,0.45);
+  transition:all 0.2s; margin-bottom:17px;
+}
+.cta-btn:hover {
+  background:var(--green-dark); transform:translateY(-1px);
+  box-shadow:0 6px 24px rgba(34,197,94,0.52);
+}
+
+/* ── Bottom link ── */
+.bottom-link { text-align:center; font-size:13.5px; color:#4b5563; }
+.bottom-link a {
+  color:var(--green-dark); font-weight:700; cursor:pointer; text-decoration:none;
+}
+.bottom-link a:hover { text-decoration:underline; }
+
+/* ── Toast notifications ── */
+#toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: white;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  pointer-events: auto;
+  min-width: 280px;
+  max-width: 360px;
+  animation: toastIn 0.4s cubic-bezier(0.22,1,0.36,1) both;
+}
+.toast.success { background: rgba(22,163,74,0.92); border: 1px solid rgba(255,255,255,0.2); }
+.toast.error   { background: rgba(220,38,38,0.92);  border: 1px solid rgba(255,255,255,0.15); }
+.toast.info    { background: rgba(37,99,235,0.92);  border: 1px solid rgba(255,255,255,0.15); }
+.toast.fadeout { animation: toastOut 0.35s ease forwards; }
+@keyframes toastIn  { from { opacity:0; transform:translateX(30px); } to { opacity:1; transform:translateX(0); } }
+@keyframes toastOut { from { opacity:1; transform:translateX(0); } to { opacity:0; transform:translateX(30px); } }
+
+/* ── Loading spinner on button ── */
+.cta-btn.loading { opacity: 0.75; pointer-events: none; cursor: not-allowed; }
+.spinner {
+  width: 16px; height: 16px;
+  border: 2.5px solid rgba(255,255,255,0.35);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Session banner ── */
+#session-banner {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(22,163,74,0.95);
+  backdrop-filter: blur(12px);
+  color: white; text-align: center;
+  padding: 14px 20px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 14px; font-weight: 500;
+  display: none;
+  gap: 12px; align-items: center; justify-content: center;
+  flex-wrap: wrap;
+}
+#session-banner.show { display: flex; }
+#session-banner a {
+  color: #bbf7d0; font-weight: 700; cursor: pointer;
+  text-decoration: underline;
+}
+</style>
+</head>
+<body>
+
+<!-- ── Supabase JS SDK v2 ── -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- ── Toast notification container ── -->
+<div id="toast-container"></div>
+
+<!-- ── Already-logged-in session banner ── -->
+<div id="session-banner">
+  <span id="session-msg">You're already signed in.</span>
+  <a onclick="handleSignOut()">Sign out</a>
+  <a href="dashboard.html">Go to Dashboard →</a>
+</div>
+
+<div class="scene-bg" id="sceneBg">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block;">
+  <defs>
+    <radialGradient id="sky" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#c8e6c9"/>
+      <stop offset="40%" stop-color="#81c784"/>
+      <stop offset="100%" stop-color="#1b5e20"/>
+    </radialGradient>
+    <radialGradient id="bgGlow" cx="55%" cy="45%" r="50%">
+      <stop offset="0%" stop-color="#f8bbd0" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#f8bbd0" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="petalGrad1" cx="40%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#fce4ec"/>
+      <stop offset="50%" stop-color="#f48fb1"/>
+      <stop offset="100%" stop-color="#c2185b"/>
+    </radialGradient>
+    <radialGradient id="petalGrad2" cx="40%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#fce4ec"/>
+      <stop offset="50%" stop-color="#f06292"/>
+      <stop offset="100%" stop-color="#ad1457"/>
+    </radialGradient>
+    <radialGradient id="petalGrad3" cx="50%" cy="20%" r="80%">
+      <stop offset="0%" stop-color="#fce4ec"/>
+      <stop offset="60%" stop-color="#ec407a"/>
+      <stop offset="100%" stop-color="#880e4f"/>
+    </radialGradient>
+    <radialGradient id="centerGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff9c4"/>
+      <stop offset="60%" stop-color="#f9a825"/>
+      <stop offset="100%" stop-color="#e65100"/>
+    </radialGradient>
+    <filter id="blur1"><feGaussianBlur stdDeviation="18"/></filter>
+    <filter id="blur2"><feGaussianBlur stdDeviation="8"/></filter>
+    <filter id="softShadow"><feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#880e4f" flood-opacity="0.3"/></filter>
+  </defs>
+
+  <!-- Deep green background -->
+  <rect width="1440" height="900" fill="url(#sky)"/>
+
+  <!-- Background bokeh blobs -->
+  <circle cx="120" cy="80" r="90" fill="#4caf50" opacity="0.25" filter="url(#blur1)"/>
+  <circle cx="1350" cy="120" r="110" fill="#2e7d32" opacity="0.3" filter="url(#blur1)"/>
+  <circle cx="200" cy="800" r="130" fill="#388e3c" opacity="0.28" filter="url(#blur1)"/>
+  <circle cx="1300" cy="780" r="100" fill="#1b5e20" opacity="0.35" filter="url(#blur1)"/>
+  <circle cx="700" cy="50" r="80" fill="#66bb6a" opacity="0.2" filter="url(#blur1)"/>
+  <circle cx="900" cy="860" r="120" fill="#2e7d32" opacity="0.3" filter="url(#blur1)"/>
+
+  <!-- Far background leaves (large, blurred) -->
+  <ellipse cx="100" cy="300" rx="180" ry="60" fill="#2e7d32" opacity="0.5" transform="rotate(-35 100 300)" filter="url(#blur2)"/>
+  <ellipse cx="1380" cy="250" rx="200" ry="65" fill="#1b5e20" opacity="0.55" transform="rotate(40 1380 250)" filter="url(#blur2)"/>
+  <ellipse cx="50" cy="650" rx="160" ry="55" fill="#388e3c" opacity="0.45" transform="rotate(-50 50 650)" filter="url(#blur2)"/>
+  <ellipse cx="1420" cy="700" rx="170" ry="60" fill="#2e7d32" opacity="0.5" transform="rotate(45 1420 700)" filter="url(#blur2)"/>
+  <ellipse cx="600" cy="880" rx="200" ry="70" fill="#1b5e20" opacity="0.4" transform="rotate(-10 600 880)" filter="url(#blur1)"/>
+  <ellipse cx="880" cy="30" rx="180" ry="58" fill="#388e3c" opacity="0.35" transform="rotate(15 880 30)" filter="url(#blur2)"/>
+
+  <!-- Mid background stems & leaves -->
+  <line x1="720" y1="900" x2="720" y2="380" stroke="#2e7d32" stroke-width="14" stroke-linecap="round" opacity="0.7"/>
+  <line x1="720" y1="700" x2="550" y2="550" stroke="#388e3c" stroke-width="10" stroke-linecap="round" opacity="0.6"/>
+  <line x1="720" y1="620" x2="900" y2="500" stroke="#388e3c" stroke-width="10" stroke-linecap="round" opacity="0.6"/>
+  <line x1="720" y1="780" x2="400" y2="700" stroke="#2e7d32" stroke-width="8" stroke-linecap="round" opacity="0.5"/>
+  <line x1="720" y1="750" x2="1020" y2="660" stroke="#2e7d32" stroke-width="8" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- Leaves mid -->
+  <ellipse cx="490" cy="510" rx="110" ry="38" fill="#33691e" transform="rotate(-38 490 510)"/>
+  <ellipse cx="940" cy="470" rx="105" ry="36" fill="#33691e" transform="rotate(32 940 470)"/>
+  <ellipse cx="340" cy="675" rx="90" ry="30" fill="#388e3c" transform="rotate(-52 340 675)"/>
+  <ellipse cx="1060" cy="635" rx="95" ry="32" fill="#388e3c" transform="rotate(48 1060 635)"/>
+  <!-- Leaf veins -->
+  <line x1="430" y1="488" x2="555" y2="535" stroke="#4caf50" stroke-width="2" opacity="0.5"/>
+  <line x1="885" y1="445" x2="998" y2="498" stroke="#4caf50" stroke-width="2" opacity="0.5"/>
+
+  <!-- Small buds on stems -->
+  <ellipse cx="560" cy="430" rx="14" ry="26" fill="#f48fb1" transform="rotate(-25 560 430)"/>
+  <ellipse cx="890" cy="400" rx="14" ry="26" fill="#ec407a" transform="rotate(20 890 400)"/>
+  <ellipse cx="460" cy="360" rx="11" ry="20" fill="#f48fb1" transform="rotate(-15 460 360)"/>
+  <ellipse cx="990" cy="350" rx="11" ry="20" fill="#f06292" transform="rotate(18 990 350)"/>
+  <ellipse cx="650" cy="310" rx="10" ry="18" fill="#fce4ec" transform="rotate(-8 650 310)"/>
+  <ellipse cx="800" cy="300" rx="10" ry="18" fill="#fce4ec" transform="rotate(10 800 300)"/>
+
+  <!-- Pink glow behind main flower -->
+  <circle cx="720" cy="440" r="260" fill="url(#bgGlow)" filter="url(#blur1)"/>
+
+  <!-- MAIN FLOWER — centered large bloom -->
+  <g transform="translate(720,440)" filter="url(#softShadow)">
+    <!-- 5 petals radiating out -->
+    <!-- Petal 1: top -->
+    <ellipse rx="72" ry="155" fill="url(#petalGrad1)" transform="rotate(0) translate(0,-90)" opacity="0.97"/>
+    <!-- Petal 2: upper right -->
+    <ellipse rx="72" ry="155" fill="url(#petalGrad2)" transform="rotate(72) translate(0,-90)" opacity="0.95"/>
+    <!-- Petal 3: lower right -->
+    <ellipse rx="72" ry="155" fill="url(#petalGrad3)" transform="rotate(144) translate(0,-90)" opacity="0.95"/>
+    <!-- Petal 4: lower left -->
+    <ellipse rx="72" ry="155" fill="url(#petalGrad2)" transform="rotate(216) translate(0,-90)" opacity="0.95"/>
+    <!-- Petal 5: upper left -->
+    <ellipse rx="72" ry="155" fill="url(#petalGrad1)" transform="rotate(288) translate(0,-90)" opacity="0.97"/>
+
+    <!-- Petal highlight streaks -->
+    <line x1="0" y1="-180" x2="0" y2="-30" stroke="rgba(255,255,255,0.35)" stroke-width="3" stroke-linecap="round" transform="rotate(0)"/>
+    <line x1="0" y1="-180" x2="0" y2="-30" stroke="rgba(255,255,255,0.25)" stroke-width="2" stroke-linecap="round" transform="rotate(72)"/>
+    <line x1="0" y1="-180" x2="0" y2="-30" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" stroke-linecap="round" transform="rotate(144)"/>
+    <line x1="0" y1="-180" x2="0" y2="-30" stroke="rgba(255,255,255,0.25)" stroke-width="2" stroke-linecap="round" transform="rotate(216)"/>
+    <line x1="0" y1="-180" x2="0" y2="-30" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" stroke-linecap="round" transform="rotate(288)"/>
+
+    <!-- Flower center -->
+    <circle r="38" fill="#fff176"/>
+    <circle r="28" fill="url(#centerGrad)"/>
+    <circle r="18" fill="#ffcc02"/>
+    <!-- Stamens -->
+    <circle cx="0" cy="-22" r="4.5" fill="#fff"/>
+    <circle cx="20" cy="-10" r="4.5" fill="#fff"/>
+    <circle cx="13" cy="17" r="4.5" fill="#fff"/>
+    <circle cx="-13" cy="17" r="4.5" fill="#fff"/>
+    <circle cx="-20" cy="-10" r="4.5" fill="#fff"/>
+    <!-- Stamen dots -->
+    <circle cx="0" cy="-22" r="2.5" fill="#f57f17"/>
+    <circle cx="20" cy="-10" r="2.5" fill="#f57f17"/>
+    <circle cx="13" cy="17" r="2.5" fill="#f57f17"/>
+    <circle cx="-13" cy="17" r="2.5" fill="#f57f17"/>
+    <circle cx="-20" cy="-10" r="2.5" fill="#f57f17"/>
+  </g>
+
+  <!-- Foreground leaf overlaps (adds depth) -->
+  <ellipse cx="150" cy="500" rx="200" ry="70" fill="#1b5e20" opacity="0.7" transform="rotate(-30 150 500)"/>
+  <ellipse cx="1310" cy="480" rx="190" ry="68" fill="#1b5e20" opacity="0.65" transform="rotate(28 1310 480)"/>
+  <ellipse cx="0" cy="750" rx="220" ry="75" fill="#2e7d32" opacity="0.6" transform="rotate(-45 0 750)"/>
+  <ellipse cx="1450" cy="750" rx="210" ry="72" fill="#2e7d32" opacity="0.6" transform="rotate(42 1450 750)"/>
+
+  <!-- Bokeh light spots (foreground) -->
+  <circle cx="250" cy="180" r="22" fill="rgba(255,255,255,0.12)" filter="url(#blur2)"/>
+  <circle cx="1180" cy="210" r="28" fill="rgba(255,255,255,0.1)" filter="url(#blur2)"/>
+  <circle cx="400" cy="820" r="18" fill="rgba(255,255,255,0.1)" filter="url(#blur2)"/>
+  <circle cx="1100" cy="800" r="24" fill="rgba(255,255,255,0.1)" filter="url(#blur2)"/>
+  <circle cx="80" cy="400" r="16" fill="rgba(255,200,150,0.15)" filter="url(#blur2)"/>
+  <circle cx="1380" cy="380" r="20" fill="rgba(255,200,150,0.12)" filter="url(#blur2)"/>
+</svg>
+</div>
+<div class="scene-overlay"></div>
+
+<div class="brand">
+  <div class="brand-logo">
+    <div class="brand-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M12 3C12 3 7 6.5 7 12c0 2.76 1.34 5.22 3.4 6.74.38-.48.93-.74 1.6-.74s1.22.26 1.6.74C15.66 17.22 17 14.76 17 12c0-5.5-5-9-5-9z" fill="white"/>
+        <path d="M12 3c0 0 0 4.5 3 7.5" stroke="rgba(255,255,255,0.45)" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <span class="brand-name">Ferosa</span>
+  </div>
+  <p class="brand-slogan">Transform your outdoor space into a paradise</p>
+  <p class="brand-sub">Join thousands of homeowners who trust Ferosa for their garden and landscaping needs.</p>
+</div>
+
+<div class="help-badge">?</div>
+
+<div class="scene">
+
+  <!-- LOGIN -->
+  <div class="page active" id="page-login">
+    <div class="form-card">
+      <div class="form-header">
+        <h1 class="form-title">Welcome Back</h1>
+        <p class="form-subtitle">Sign in to your Ferosa account</p>
+      </div>
+
+      <div class="social-row">
+        <!-- Configure providers in Supabase dashboard → Auth → Providers -->
+        <button class="social-btn" onclick="handleOAuth('google')">
+          <svg width="15" height="15" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Google
+        </button>
+        <button class="social-btn" onclick="handleOAuth('apple')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.13-2.2 1.28-2.18 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          Apple
+        </button>
+        <button class="social-btn" onclick="handleOAuth('facebook')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </button>
+      </div>
+
+      <div class="divider">or continue with email</div>
+
+      <div class="field">
+        <label class="field-label">Email Address</label>
+        <div class="input-wrap">
+          <span class="input-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
+          <input id="login-email" type="email" placeholder="you@example.com">
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label-row">
+          <label class="field-label" style="margin:0">Password</label>
+          <a class="forgot-link" onclick="handleForgotPassword()">Forgot password?</a>
+        </div>
+        <div class="input-wrap has-eye">
+          <span class="input-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+          <input id="login-password" type="password" placeholder="••••••••">
+          <span class="input-eye" onclick="togglePw(this)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></span>
+        </div>
+      </div>
+
+      <button id="login-btn" class="cta-btn" style="margin-top:8px" onclick="handleLogin()">
+        Sign In
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+
+      <p class="bottom-link">Don't have an account? <a onclick="switchTo('signup')">Sign up</a></p>
+    </div>
+  </div>
+
+  <!-- SIGNUP -->
+  <div class="page" id="page-signup">
+    <div class="form-card">
+      <div class="form-header">
+        <h1 class="form-title">Create Account</h1>
+        <p class="form-subtitle">Join Ferosa and start designing your dream garden</p>
+      </div>
+
+      <div class="social-row">
+        <!-- Configure providers in Supabase dashboard → Auth → Providers -->
+        <button class="social-btn" onclick="handleOAuth('google')">
+          <svg width="15" height="15" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Google
+        </button>
+        <button class="social-btn" onclick="handleOAuth('apple')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.13-2.2 1.28-2.18 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          Apple
+        </button>
+        <button class="social-btn" onclick="handleOAuth('facebook')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          Facebook
+        </button>
+      </div>
+
+      <div class="divider">or continue with email</div>
+
+      <div class="field">
+        <label class="field-label">Full Name</label>
+        <div class="input-wrap">
+          <span class="input-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+          <input id="signup-name" type="text" placeholder="John Doe">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Email Address</label>
+        <div class="input-wrap">
+          <span class="input-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
+          <input id="signup-email" type="email" placeholder="you@example.com">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Password</label>
+        <div class="input-wrap has-eye">
+          <span class="input-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+          <input id="signup-password" type="password" placeholder="••••••••">
+          <span class="input-eye" onclick="togglePw(this)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></span>
+        </div>
+      </div>
+
+      <span class="acct-label">Account Type</span>
+      <div class="acct-row" id="acct-row">
+        <button class="acct-btn selected" onclick="selectAcct(this)">
+          <span class="aname">Customer</span>
+          <span class="adesc">Book services &amp; shop</span>
+        </button>
+        <button class="acct-btn" onclick="selectAcct(this)">
+          <span class="aname">Business</span>
+          <span class="adesc">Manage operations</span>
+        </button>
+      </div>
+
+      <button id="signup-btn" class="cta-btn" onclick="handleSignup()">
+        Create Account
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+
+      <p class="bottom-link">Already have an account? <a onclick="switchTo('login')">Sign in</a></p>
+    </div>
+  </div>
+
+</div><!-- /scene -->
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   SUPABASE CLIENT INITIALIZATION
+   ─────────────────────────────────────────────────────────────
+   ⚠️  IMPORTANT: Never expose service_role key in frontend code!
+   Only the anon/public key is safe to use here.
+   Set up Row Level Security (RLS) on all Supabase tables.
+═══════════════════════════════════════════════════════════════ */
+const { createClient } = supabase;
+
+const SUPABASE_URL  = 'https://zvcekpmcpfkuymwssocb.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2Y2VrcG1jcGZrdXltd3Nzb2NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzYyMDAsImV4cCI6MjA4ODg1MjIwMH0.5XpfsEtK_sFk5CTH6wHc4v6xdDR28h6lQe7j8dwgrvk';
+
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+/* ═══════════════════════════════════════════════════════════════
+   TOAST NOTIFICATION SYSTEM
+═══════════════════════════════════════════════════════════════ */
+function showToast(message, type = 'info', duration = 4500) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+
+  const icons = {
+    success: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>',
+    error:   '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+    info:    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+  };
+
+  toast.innerHTML = `${icons[type] || icons.info}<span>${message}</span>`;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add('fadeout');
+    toast.addEventListener('animationend', () => toast.remove());
+  }, duration);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BUTTON LOADING STATE HELPERS
+═══════════════════════════════════════════════════════════════ */
+function setLoading(btnId, loading, originalHTML) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  if (loading) {
+    btn._originalHTML = btn.innerHTML;
+    btn.classList.add('loading');
+    btn.innerHTML = `<div class="spinner"></div> Processing...`;
+  } else {
+    btn.classList.remove('loading');
+    btn.innerHTML = originalHTML || btn._originalHTML || btn.innerHTML;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SESSION CHECK ON PAGE LOAD
+   ─────────────────────────────────────────────────────────────
+   If already logged in, show banner at top so user can navigate
+   to the dashboard or sign out.
+═══════════════════════════════════════════════════════════════ */
+(async () => {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session?.user) {
+      console.info('[Ferosa] Active session detected:', session.user.email);
+      const banner  = document.getElementById('session-banner');
+      const msgEl   = document.getElementById('session-msg');
+      msgEl.textContent = `You're already signed in as ${session.user.email}`;
+      banner.classList.add('show');
+    }
+  } catch (err) {
+    console.error('[Ferosa] Session check failed:', err);
+  }
+})();
+
+/* ── Listen for auth state changes (e.g. after OAuth redirect) ── */
+sb.auth.onAuthStateChange((event, session) => {
+  console.info('[Ferosa] Auth event:', event, session?.user?.email ?? 'no user');
+
+  if (event === 'SIGNED_IN' && session?.user) {
+    showToast(`Welcome, ${session.user.user_metadata?.full_name || session.user.email}! 🌿`, 'success');
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1800);
+  }
+
+  if (event === 'SIGNED_OUT') {
+    document.getElementById('session-banner').classList.remove('show');
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   SIGN IN (EMAIL + PASSWORD)
+═══════════════════════════════════════════════════════════════ */
+async function handleLogin() {
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+
+  // ── Client-side validation ──
+  if (!email) { showToast('Please enter your email address.', 'error'); return; }
+  if (!password) { showToast('Please enter your password.', 'error'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast('Please enter a valid email address.', 'error'); return;
+  }
+
+  setLoading('login-btn', true);
+
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+    if (error) throw error;
+
+    console.info('[Ferosa] Login success:', data.user.email);
+    showToast('Signed in successfully! Redirecting... 🌿', 'success');
+
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1600);
+
+  } catch (err) {
+    console.error('[Ferosa] Login error:', err.message);
+
+    // Friendly error messages
+    const msg = err.message.toLowerCase();
+    if (msg.includes('invalid login') || msg.includes('invalid credentials')) {
+      showToast('Incorrect email or password. Please try again.', 'error');
+    } else if (msg.includes('email not confirmed')) {
+      showToast('Please confirm your email first. Check your inbox.', 'error');
+    } else if (msg.includes('too many requests')) {
+      showToast('Too many attempts. Please wait a moment and try again.', 'error');
+    } else {
+      showToast(err.message || 'Sign in failed. Please try again.', 'error');
+    }
+
+    setLoading('login-btn', false);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CREATE ACCOUNT (SIGN UP)
+   ─────────────────────────────────────────────────────────────
+   Supabase DB Setup (run in SQL Editor):
+   ─────────────────────────────────────────────────────────────
+   CREATE TABLE profiles (
+     id           UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
+     full_name    TEXT,
+     account_type TEXT CHECK (account_type IN ('Customer', 'Business')),
+     updated_at   TIMESTAMPTZ DEFAULT NOW()
+   );
+   ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+   CREATE POLICY "Users can view own profile"   ON profiles FOR SELECT USING (auth.uid() = id);
+   CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
+
+   -- Auto-create profile on signup:
+   CREATE OR REPLACE FUNCTION public.handle_new_user()
+   RETURNS TRIGGER AS $$
+   BEGIN
+     INSERT INTO public.profiles (id, full_name, account_type)
+     VALUES (
+       NEW.id,
+       NEW.raw_user_meta_data->>'full_name',
+       NEW.raw_user_meta_data->>'account_type'
+     );
+     RETURN NEW;
+   END;
+   $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+   CREATE TRIGGER on_auth_user_created
+     AFTER INSERT ON auth.users
+     FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+═══════════════════════════════════════════════════════════════ */
+async function handleSignup() {
+  const fullName   = document.getElementById('signup-name').value.trim();
+  const email      = document.getElementById('signup-email').value.trim();
+  const password   = document.getElementById('signup-password').value;
+  const acctBtn    = document.querySelector('#acct-row .acct-btn.selected');
+  const acctType   = acctBtn ? acctBtn.querySelector('.aname').textContent : 'Customer';
+
+  // ── Client-side validation ──
+  if (!fullName)  { showToast('Please enter your full name.', 'error'); return; }
+  if (!email)     { showToast('Please enter your email address.', 'error'); return; }
+  if (!password)  { showToast('Please create a password.', 'error'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast('Please enter a valid email address.', 'error'); return;
+  }
+  if (password.length < 6) {
+    showToast('Password must be at least 6 characters.', 'error'); return;
+  }
+
+  setLoading('signup-btn', true);
+
+  try {
+    const { data, error } = await sb.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name:    fullName,
+          account_type: acctType,
+        }
+      }
+    });
+
+    if (error) throw error;
+
+    console.info('[Ferosa] Signup result:', data);
+
+    if (data.session) {
+      // Auto-signed in (email confirmation disabled in Supabase dashboard)
+      showToast(`Welcome to Ferosa, ${fullName}! 🌿 Redirecting...`, 'success');
+      setTimeout(() => { window.location.href = 'dashboard.html'; }, 1800);
+    } else {
+      // Email confirmation required
+      showToast(`Account created! 📧 Check your email to confirm your account.`, 'success', 7000);
+      setLoading('signup-btn', false);
+    }
+
+  } catch (err) {
+    console.error('[Ferosa] Signup error:', err.message);
+
+    const msg = err.message.toLowerCase();
+    if (msg.includes('already registered') || msg.includes('user already exists')) {
+      showToast('An account with this email already exists. Try signing in.', 'error');
+    } else if (msg.includes('password')) {
+      showToast('Password is too weak. Use at least 6 characters.', 'error');
+    } else if (msg.includes('valid email')) {
+      showToast('Please enter a valid email address.', 'error');
+    } else {
+      showToast(err.message || 'Account creation failed. Please try again.', 'error');
+    }
+
+    setLoading('signup-btn', false);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   OAUTH — SOCIAL SIGN IN
+   ─────────────────────────────────────────────────────────────
+   Enable providers in: Supabase Dashboard → Auth → Providers
+   Then set redirect URL to: https://yourdomain.com/dashboard.html
+═══════════════════════════════════════════════════════════════ */
+async function handleOAuth(provider) {
+  try {
+    showToast(`Connecting to ${provider.charAt(0).toUpperCase() + provider.slice(1)}...`, 'info', 3000);
+
+    const { error } = await sb.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/dashboard.html`
+      }
+    });
+
+    if (error) throw error;
+
+  } catch (err) {
+    console.error(`[Ferosa] OAuth (${provider}) error:`, err.message);
+    showToast(`${provider} sign-in failed. Make sure it's enabled in Supabase dashboard.`, 'error');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FORGOT PASSWORD
+   ─────────────────────────────────────────────────────────────
+   Sends a password reset email via Supabase.
+   Set redirect URL in: Supabase Dashboard → Auth → URL Configuration
+═══════════════════════════════════════════════════════════════ */
+async function handleForgotPassword() {
+  const emailInput = document.getElementById('login-email');
+  const email = emailInput ? emailInput.value.trim() : '';
+
+  if (!email) {
+    showToast('Enter your email address above first, then click "Forgot password?".', 'info', 5000);
+    if (emailInput) emailInput.focus();
+    return;
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast('Please enter a valid email address.', 'error'); return;
+  }
+
+  try {
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password.html`
+    });
+
+    if (error) throw error;
+
+    showToast(`Password reset email sent to ${email}. Check your inbox! 📧`, 'success', 6000);
+
+  } catch (err) {
+    console.error('[Ferosa] Password reset error:', err.message);
+    showToast(err.message || 'Could not send reset email. Please try again.', 'error');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SIGN OUT (from session banner)
+═══════════════════════════════════════════════════════════════ */
+async function handleSignOut() {
+  try {
+    await sb.auth.signOut();
+    showToast('You have been signed out.', 'info');
+    document.getElementById('session-banner').classList.remove('show');
+  } catch (err) {
+    console.error('[Ferosa] Sign out error:', err.message);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EXISTING UI FUNCTIONS (preserved)
+═══════════════════════════════════════════════════════════════ */
+function switchTo(target) {
+  const fromPage = document.querySelector('.page.active');
+  const toPage   = document.getElementById('page-' + target);
+  if (!fromPage || fromPage === toPage) return;
+
+  const card = fromPage.querySelector('.form-card');
+  card.style.animation = 'fadeDown 0.28s ease forwards';
+
+  setTimeout(() => {
+    fromPage.classList.remove('active');
+    toPage.classList.add('active');
+    const newCard = toPage.querySelector('.form-card');
+    newCard.style.animation = 'none';
+    requestAnimationFrame(() => {
+      newCard.style.animation = 'fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both';
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 260);
+}
+
+function togglePw(eye) {
+  const input = eye.previousElementSibling;
+  input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+function selectAcct(btn) {
+  btn.closest('.acct-row').querySelectorAll('.acct-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+// ── Parallax mouse effect on SVG background ──
+document.addEventListener('mousemove', e => {
+  const x = (e.clientX / window.innerWidth  - 0.5) * 12;
+  const y = (e.clientY / window.innerHeight - 0.5) * 12;
+  document.getElementById('sceneBg').style.transform = `scale(1.06) translate(${x}px,${y}px)`;
+});
+
+// ── Allow Enter key to submit forms ──
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const loginPage  = document.getElementById('page-login');
+  const signupPage = document.getElementById('page-signup');
+  if (loginPage.classList.contains('active'))  handleLogin();
+  if (signupPage.classList.contains('active')) handleSignup();
+});
+</script>
+</body>
+</html>
