@@ -346,7 +346,7 @@ html, body {
 <div id="session-banner">
   <span id="session-msg">You're already signed in.</span>
   <a onclick="handleSignOut()">Sign out</a>
-  <a href="dashboard.html">Go to Dashboard →</a>
+  <a href="ferosa-home.html">Go to Dashboard →</a>
 </div>
 
 <div class="scene-bg" id="sceneBg">
@@ -716,7 +716,7 @@ sb.auth.onAuthStateChange((event, session) => {
 
   if (event === 'SIGNED_IN' && session?.user) {
     showToast(`Welcome, ${session.user.user_metadata?.full_name || session.user.email}! 🌿`, 'success');
-    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1800);
+    setTimeout(() => { window.location.href = 'ferosa-home.html'; }, 1800);
   }
 
   if (event === 'SIGNED_OUT') {
@@ -748,7 +748,7 @@ async function handleLogin() {
     console.info('[Ferosa] Login success:', data.user.email);
     showToast('Signed in successfully! Redirecting... 🌿', 'success');
 
-    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1600);
+    setTimeout(() => { window.location.href = 'ferosa-home.html'; }, 1600);
 
   } catch (err) {
     console.error('[Ferosa] Login error:', err.message);
@@ -841,7 +841,7 @@ async function handleSignup() {
     if (data.session) {
       // Auto-signed in (email confirmation disabled in Supabase dashboard)
       showToast(`Welcome to Ferosa, ${fullName}! 🌿 Redirecting...`, 'success');
-      setTimeout(() => { window.location.href = 'dashboard.html'; }, 1800);
+      setTimeout(() => { window.location.href = 'ferosa-home.html'; }, 1800);
     } else {
       // Email confirmation required
       showToast(`Account created! 📧 Check your email to confirm your account.`, 'success', 7000);
@@ -870,7 +870,7 @@ async function handleSignup() {
    OAUTH — SOCIAL SIGN IN
    ─────────────────────────────────────────────────────────────
    Enable providers in: Supabase Dashboard → Auth → Providers
-   Then set redirect URL to: https://yourdomain.com/dashboard.html
+   Then set redirect URL to: https://yourdomain.com/ferosa-home.html
 ═══════════════════════════════════════════════════════════════ */
 async function handleOAuth(provider) {
   try {
@@ -879,7 +879,7 @@ async function handleOAuth(provider) {
     const { error } = await sb.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/dashboard.html`
+        redirectTo: `${window.location.origin}/ferosa-home.html`
       }
     });
 

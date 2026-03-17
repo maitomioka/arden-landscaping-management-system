@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schedule Service – Ferosa</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&family=Figtree:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          green: {
+            50:  '#f0fdf4',
+            100: '#dcfce7',
+            400: '#4ade80',
+            500: '#22c55e',
+            600: '#16a34a',
+            700: '#15803d',
+            800: '#166534',
+            900: '#14532d',
+            950: '#052e16',
+          }
+        },
+        fontFamily: {
+          display: ['"Cormorant Garamond"', 'serif'],
+          body:    ['"Figtree"', 'sans-serif'],
+        }
+      }
+    }
+  }
+</script>
+<style>
+  * { font-family: 'Figtree', sans-serif; }
+  html { scroll-behavior: smooth; }
+
+  /* Nav active */
+  .nav-active {
+    background: #22c55e;
+    color: white !important;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-weight: 600;
+  }
+
+  /* Footer */
+  .footer-bg { background: #052e16; }
+
+  /* Mobile menu */
+  #mobile-menu { display: none; }
+  #mobile-menu.open { display: block; }
+
+  /* Calendar day hover */
+  .cal-day {
+    width: 48px; height: 48px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 12px;
+    font-size: 15px; font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    margin: 0 auto;
+  }
+  .cal-day:hover { background: #f0fdf4; color: #15803d; }
+  .cal-day.selected { background: #22c55e; color: white; font-weight: 700; box-shadow: 0 4px 14px rgba(34,197,94,0.4); }
+  .cal-day.today    { border: 2px solid #22c55e; color: #15803d; font-weight: 700; }
+  .cal-day.limited  { position: relative; }
+  .cal-day.limited::after  { content:''; position:absolute; bottom:4px; left:50%; transform:translateX(-50%); width:5px; height:5px; border-radius:50%; background:#f59e0b; }
+  .cal-day.booked   { color: #d1d5db; cursor: not-allowed; }
+  .cal-day.booked:hover { background: transparent; color: #d1d5db; }
+  .cal-day.empty    { cursor: default; }
+  .cal-day.empty:hover { background: transparent; }
+
+  /* Time slot buttons */
+  .time-btn {
+    width: 100%;
+    display: flex; align-items: center; gap: 8px;
+    padding: 11px 14px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 12px;
+    background: white;
+    font-family: 'Figtree', sans-serif;
+    font-size: 14px; font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+  .time-btn:hover  { border-color: #22c55e; background: #f0fdf4; color: #15803d; }
+  .time-btn.selected {
+    background: #22c55e; border-color: #22c55e;
+    color: white;
+    box-shadow: 0 4px 12px rgba(34,197,94,0.35);
+  }
+  .time-btn.selected svg { stroke: white; }
+
+  /* Toast */
+  #toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: #111827; color: white;
+    padding: 14px 24px; border-radius: 14px;
+    font-size: 14px; font-weight: 500;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    z-index: 9999; opacity: 0;
+    transition: all 0.35s cubic-bezier(0.22,1,0.36,1);
+    white-space: nowrap;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Service select */
+  .service-select {
+    width: 100%; padding: 11px 14px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 12px;
+    font-family: 'Figtree', sans-serif;
+    font-size: 14px; color: #374151;
+    background: white;
+    outline: none; cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+    transition: border-color 0.2s;
+  }
+  .service-select:focus { border-color: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,0.12); }
+
+  /* Book Now btn */
+  .book-btn {
+    width: 100%; padding: 15px;
+    background: #22c55e; color: white; border: none;
+    border-radius: 14px;
+    font-family: 'Figtree', sans-serif;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer; letter-spacing: 0.2px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 4px 20px rgba(34,197,94,0.4);
+    transition: all 0.2s;
+  }
+  .book-btn:hover {
+    background: #15803d; transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(34,197,94,0.5);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #f0fdf4; }
+  ::-webkit-scrollbar-thumb { background: #22c55e; border-radius: 3px; }
+
+  /* Hero pattern overlay */
+  .hero-pattern {
+    background-image:
+      radial-gradient(circle at 20% 80%, rgba(255,255,255,0.05) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255,255,255,0.05) 0%, transparent 50%);
+  }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+<!-- ═══════════════════════════════════════════════
+     NAVIGATION — matches ferosa-home.html exactly
+     NAVIGATION LINKS:
+       Home       → ferosa-home.html
+       Services   → # (future page)
+       Customize  → # (future page)
+       Shop       → # (future page)
+       Orders     → # (future page)
+       Schedule   → schedule.html (ACTIVE — highlighted)
+       Account    → # (future page)
+       Admin      → # (future page)
+═══════════════════════════════════════════════ -->
+<nav class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+
+      <!-- Logo -->
+      <a href="ferosa-home.html" class="flex items-center gap-2.5 flex-shrink-0">
+        <div class="w-9 h-9 bg-green-600 rounded-xl flex items-center justify-center shadow-md">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M12 3C12 3 7 6.5 7 12c0 2.76 1.34 5.22 3.4 6.74.38-.48.93-.74 1.6-.74s1.22.26 1.6.74C15.66 17.22 17 14.76 17 12c0-5.5-5-9-5-9z" fill="white"/>
+            <path d="M12 3c0 0 0 4 2.5 7" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="text-xl font-bold text-gray-900 tracking-tight">Ferosa</span>
+      </a>
+
+      <!-- Desktop Nav -->
+      <div class="hidden lg:flex items-center gap-1">
+        <a href="ferosa-home.html"  class="text-sm font-medium text-gray-600 hover:text-green-600 px-3 py-1.5 rounded-md transition-colors">Home</a>
+        <a href="#"                 class="text-sm font-medium text-gray-600 hover:text-green-600 px-3 py-1.5 rounded-md transition-colors">Services</a>
+        <a href="#"                 class="text-sm font-medium text-gray-600 hover:text-green-600 px-3 py-1.5 rounded-md transition-colors">Customize Garden</a>
+        <a href="#"                 class="text-sm font-medium text-gray-600 hover:text-green-600 px-3 py-1.5 rounded-md transition-colors">Shop</a>
+        <a href="#"                 class="text-sm font-medium text-gray-600 hover:text-green-600 px-3 py-1.5 rounded-md transition-colors">Orders</a>
+        <a href="schedule.html"     class="nav-active text-sm">Schedule</a>
+        <a href="#"                 class="text-sm font-medium text-gray-600 hover:text-green-600 px-3 py-1.5 rounded-md transition-colors">Account</a>
+        <a href="#"                 class="text-sm font-semibold text-yellow-700 hover:text-yellow-600 px-3 py-1.5 rounded-md transition-colors">Admin</a>
+      </div>
+
+      <!-- Right Icons -->
+      <div class="hidden lg:flex items-center gap-4">
+        <button class="text-gray-500 hover:text-green-600 transition-colors">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </button>
+        <button class="relative text-gray-500 hover:text-green-600 transition-colors">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-white"></span>
+        </button>
+        <button class="relative text-gray-500 hover:text-green-600 transition-colors">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span class="absolute -top-1.5 -right-1.5 bg-green-600 text-white text-[10px] font-bold rounded-full w-[18px] h-[18px] flex items-center justify-center">3</span>
+        </button>
+        <button class="text-gray-500 hover:text-green-600 transition-colors">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </button>
+      </div>
+
+      <!-- Mobile hamburger -->
+      <button class="lg:hidden text-gray-600 hover:text-green-600" onclick="document.getElementById('mobile-menu').classList.toggle('open')">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="lg:hidden bg-white border-t border-gray-100 px-4 py-3">
+    <div class="flex flex-col gap-1">
+      <a href="ferosa-home.html" class="text-sm font-medium text-gray-600 px-3 py-2 rounded-md hover:bg-gray-50">Home</a>
+      <a href="#"                class="text-sm font-medium text-gray-600 px-3 py-2 rounded-md hover:bg-gray-50">Services</a>
+      <a href="#"                class="text-sm font-medium text-gray-600 px-3 py-2 rounded-md hover:bg-gray-50">Customize Garden</a>
+      <a href="#"                class="text-sm font-medium text-gray-600 px-3 py-2 rounded-md hover:bg-gray-50">Shop</a>
+      <a href="#"                class="text-sm font-medium text-gray-600 px-3 py-2 rounded-md hover:bg-gray-50">Orders</a>
+      <a href="schedule.html"    class="text-sm font-semibold text-white bg-green-600 px-3 py-2 rounded-md">Schedule</a>
+      <a href="#"                class="text-sm font-medium text-gray-600 px-3 py-2 rounded-md hover:bg-gray-50">Account</a>
+      <a href="#"                class="text-sm font-semibold text-yellow-700 px-3 py-2 rounded-md hover:bg-gray-50">Admin</a>
+    </div>
+  </div>
+</nav>
+
+
+<!-- ═══════════════════════════════════════════════
+     HERO — Schedule Service header
+═══════════════════════════════════════════════ -->
+<section class="pt-16">
+  <!-- REPLACE WITH SOFT GREEN LEAF BACKGROUND IMAGE -->
+  <div class="relative bg-gradient-to-br from-green-700 via-green-600 to-green-500 hero-pattern overflow-hidden">
+    <!-- Decorative leaf blobs (placeholder — replace with official image) -->
+    <div class="absolute inset-0 opacity-10 pointer-events-none select-none flex items-center justify-center">
+      <span class="text-white text-xs font-mono tracking-widest">REPLACE WITH SOFT GREEN LEAF BACKGROUND</span>
+    </div>
+    <!-- Subtle circle decoration -->
+    <div class="absolute -top-16 -right-16 w-64 h-64 bg-white/5 rounded-full"></div>
+    <div class="absolute -bottom-10 -left-10 w-48 h-48 bg-black/5 rounded-full"></div>
+
+    <div class="relative z-10 max-w-3xl mx-auto px-6 py-16 sm:py-20 text-center">
+      <!-- Calendar icon badge -->
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl mb-6 shadow-lg border border-white/25">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+      </div>
+
+      <h1 class="font-display font-bold text-white text-4xl sm:text-5xl mb-4" style="font-family:'Cormorant Garamond',serif;">
+        Schedule Service
+      </h1>
+      <p class="text-white/85 text-base sm:text-lg leading-relaxed max-w-xl mx-auto">
+        Book your landscaping services, deliveries, or pick-ups. Choose<br class="hidden sm:block"> a convenient date and time.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════
+     MAIN CONTENT — Calendar + Booking Panel
+═══════════════════════════════════════════════ -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+  <div class="flex flex-col lg:flex-row gap-6 items-start">
+
+    <!-- ── LEFT: Calendar ── -->
+    <div class="w-full lg:flex-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+
+      <!-- Month navigation -->
+      <div class="flex items-center justify-between mb-8">
+        <button id="prev-month" class="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 hover:border-green-400 hover:bg-green-50 text-gray-500 hover:text-green-600 transition-all">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <h2 id="month-label" class="text-lg font-bold text-gray-900" style="font-family:'Figtree',sans-serif;">February 2026</h2>
+        <button id="next-month" class="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 hover:border-green-400 hover:bg-green-50 text-gray-500 hover:text-green-600 transition-all">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+
+      <!-- Day headers -->
+      <div class="grid grid-cols-7 mb-2">
+        <div class="text-center text-xs font-semibold text-gray-400 uppercase tracking-wide py-2">Sun</div>
+        <div class="text-center text-xs font-semibold text-gray-400 uppercase tracking-wide py-2">Mon</div>
+        <div class="text-center text-xs font-semibold text-gray-400 uppercase tracking-wide py-2">Tue</div>
+        <div class="text-center text-xs font-semibold text-gray-400 uppercase tracking-wide py-2">Wed</div>
+        <div class="text-center text-xs font-semibold text-gray-400 uppercase tracking-wide py-2">Thu</div>
+        <div class="text-center text-xs font-semibold text-gray-400 uppercase tracking-wide py-2">Fri</div>
+        <div class="text-center text-xs font-semibold text-gray-400 uppercase tracking-wide py-2">Sat</div>
+      </div>
+
+      <!-- Calendar grid — rendered by JS -->
+      <div id="cal-grid" class="grid grid-cols-7 gap-y-1"></div>
+
+      <!-- Divider -->
+      <div class="border-t border-gray-100 mt-6 pt-5">
+        <div class="flex items-center gap-6 flex-wrap">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-green-500 flex-shrink-0"></span>
+            <span class="text-sm text-gray-500">Available</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-amber-400 flex-shrink-0"></span>
+            <span class="text-sm text-gray-500">Limited</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-300 flex-shrink-0"></span>
+            <span class="text-sm text-gray-500">Fully Booked</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RIGHT: Service + Time selector ── -->
+    <div class="w-full lg:w-80 xl:w-96 flex flex-col gap-5">
+
+      <!-- Select Service card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h3 class="font-bold text-gray-900 text-base mb-4">Select Service</h3>
+        <div class="relative">
+          <select id="service-select" class="service-select" onchange="updateSummary()">
+            <option>Garden Design Consultation</option>
+            <option>Lawn Care &amp; Mowing</option>
+            <option>Plant Installation</option>
+            <option>Hardscaping</option>
+            <option>Irrigation System Setup</option>
+            <option>Tree Trimming</option>
+            <option>Seasonal Planting</option>
+            <option>Delivery – Plants &amp; Supplies</option>
+            <option>Pick-up – Yard Waste</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Available Times card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div class="mb-5">
+          <h3 class="font-bold text-gray-900 text-base">Available Times</h3>
+          <p id="selected-date-label" class="text-gray-500 text-sm mt-1">Sunday, February 22</p>
+        </div>
+        <div class="grid grid-cols-2 gap-2.5" id="time-grid"></div>
+      </div>
+
+      <!-- Booking Summary card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h3 class="font-bold text-gray-900 text-base mb-5">Booking Summary</h3>
+        <div class="flex flex-col gap-3.5">
+          <!-- Date -->
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div>
+              <p class="text-xs text-gray-400 font-medium mb-0.5">Date</p>
+              <p id="summary-date" class="text-sm font-semibold text-gray-800">–</p>
+            </div>
+          </div>
+          <!-- Time -->
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div>
+              <p class="text-xs text-gray-400 font-medium mb-0.5">Time</p>
+              <p id="summary-time" class="text-sm font-semibold text-gray-800">–</p>
+            </div>
+          </div>
+          <!-- Service -->
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div>
+              <p class="text-xs text-gray-400 font-medium mb-0.5">Service</p>
+              <p id="summary-service" class="text-sm font-semibold text-gray-800">Garden Design Consultation</p>
+            </div>
+          </div>
+          <!-- Slots remaining -->
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            </div>
+            <div>
+              <p class="text-xs text-gray-400 font-medium mb-0.5">Slots Remaining</p>
+              <p id="summary-slots" class="text-sm font-semibold text-gray-800">Select a date to check</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Confirm Booking button -->
+      <button class="book-btn" id="confirm-btn" onclick="handleBookNow()">
+        Confirm Booking
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+
+      <!-- Info note -->
+      <p class="text-xs text-gray-400 text-center leading-relaxed">
+        You'll receive a confirmation email after booking.<br>
+        Cancellations must be made 24 hours in advance.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════
+     CONFIRMATION MODAL
+═══════════════════════════════════════════════ -->
+<!-- Backdrop -->
+<div id="modal-backdrop" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-center justify-center px-4"
+     style="display:none">
+  <div id="modal-box" class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center relative"
+       style="animation:none">
+
+    <!-- Icon circle -->
+    <div id="modal-icon-wrap" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5">
+      <!-- icon injected by JS -->
+    </div>
+
+    <h2 id="modal-title" class="text-xl font-bold text-gray-900 mb-2"></h2>
+    <p  id="modal-msg"   class="text-gray-500 text-sm leading-relaxed mb-6"></p>
+
+    <!-- Badges row (email / sms sent) — shown only on success -->
+    <div id="modal-badges" class="hidden flex justify-center gap-3 mb-6">
+      <span class="inline-flex items-center gap-1.5 bg-green-50 border border-green-200 text-green-700 text-xs font-semibold px-3 py-1.5 rounded-full">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        Email sent
+      </span>
+      <span class="inline-flex items-center gap-1.5 bg-green-50 border border-green-200 text-green-700 text-xs font-semibold px-3 py-1.5 rounded-full">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.99 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.9 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        SMS sent
+      </span>
+    </div>
+
+    <button id="modal-close-btn" class="book-btn" onclick="closeModal()">Done</button>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div id="toast"></div>
+
+<!-- ═══════════════════════════════════════════════
+     FOOTER — identical to ferosa-home.html
+═══════════════════════════════════════════════ -->
+<footer class="footer-bg text-gray-300">
+  <div class="max-w-7xl mx-auto px-6 py-14 sm:py-16">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+
+      <!-- Brand column -->
+      <div>
+        <div class="flex items-center gap-2.5 mb-4">
+          <div class="w-9 h-9 bg-green-600 rounded-xl flex items-center justify-center shadow-md">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3C12 3 7 6.5 7 12c0 2.76 1.34 5.22 3.4 6.74.38-.48.93-.74 1.6-.74s1.22.26 1.6.74C15.66 17.22 17 14.76 17 12c0-5.5-5-9-5-9z" fill="white"/>
+            </svg>
+          </div>
+          <span class="text-xl font-bold text-white">Ferosa</span>
+        </div>
+        <p class="text-gray-400 text-sm leading-relaxed mb-6 max-w-xs">
+          Expert garden &amp; landscaping services transforming outdoor spaces into beautiful, sustainable environments since 2015.
+        </p>
+        <div class="flex gap-3">
+          <a href="#" class="w-9 h-9 bg-white/10 hover:bg-green-600 rounded-lg flex items-center justify-center transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          </a>
+          <a href="#" class="w-9 h-9 bg-white/10 hover:bg-green-600 rounded-lg flex items-center justify-center transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+          <a href="#" class="w-9 h-9 bg-white/10 hover:bg-green-600 rounded-lg flex items-center justify-center transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+          </a>
+          <a href="#" class="w-9 h-9 bg-white/10 hover:bg-green-600 rounded-lg flex items-center justify-center transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-1.96C18.88 4 12 4 12 4s-6.88 0-8.6.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.94 1.95C5.12 20 12 20 12 20s6.88 0 8.6-.47a2.78 2.78 0 0 0 1.94-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#052e16"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div>
+        <h4 class="text-white font-bold text-sm uppercase tracking-widest mb-5">Quick Links</h4>
+        <ul class="space-y-2.5">
+          <li><a href="ferosa-home.html" class="text-gray-400 text-sm hover:text-white transition-colors">Home</a></li>
+          <li><a href="#" class="text-gray-400 text-sm hover:text-white transition-colors">Services</a></li>
+          <li><a href="#" class="text-gray-400 text-sm hover:text-white transition-colors">Customize Garden</a></li>
+          <li><a href="#" class="text-gray-400 text-sm hover:text-white transition-colors">Shop</a></li>
+          <li><a href="schedule.html" class="text-green-400 text-sm hover:text-white transition-colors">Schedule</a></li>
+          <li><a href="#" class="text-gray-400 text-sm hover:text-white transition-colors">Cost Estimator</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact -->
+      <div>
+        <h4 class="text-white font-bold text-sm uppercase tracking-widest mb-5">Contact Us</h4>
+        <ul class="space-y-3.5">
+          <li class="flex items-start gap-3">
+            <svg class="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span class="text-gray-400 text-sm leading-relaxed">A. Arellano Ave. Mulawin, Orani, Bataan, Philippines, 2112</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <svg class="flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.99 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.9 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span class="text-gray-400 text-sm">(909) 110 0789</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <svg class="flex-shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            <span class="text-gray-400 text-sm"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4f272a2323200f292a3d203c2e612c2022">[email&#160;protected]</a></span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Newsletter -->
+      <div>
+        <h4 class="text-white font-bold text-sm uppercase tracking-widest mb-5">Newsletter</h4>
+        <p class="text-gray-400 text-sm leading-relaxed mb-5">Get gardening tips and exclusive offers delivered to your inbox.</p>
+        <div class="flex gap-2">
+          <input type="email" placeholder="Your email"
+            class="flex-1 bg-white/10 border border-white/15 text-white placeholder-gray-500 text-sm px-4 py-2.5 rounded-xl outline-none focus:border-green-500 focus:bg-white/15 transition-all">
+          <button class="bg-green-600 hover:bg-green-500 text-white font-semibold text-sm px-4 py-2.5 rounded-xl transition-colors flex-shrink-0">Join</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="border-t border-white/10">
+    <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p class="text-gray-500 text-sm">© 2026 Ferosa Garden &amp; Landscaping. All rights reserved.</p>
+      <div class="flex gap-5">
+        <a href="#" class="text-gray-500 text-sm hover:text-white transition-colors">Privacy Policy</a>
+        <a href="#" class="text-gray-500 text-sm hover:text-white transition-colors">Terms of Service</a>
+        <a href="#" class="text-gray-500 text-sm hover:text-white transition-colors">Sitemap</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Help badge -->
+<div class="fixed bottom-6 right-6 z-50 w-10 h-10 bg-gray-900 hover:bg-green-700 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-lg cursor-pointer transition-colors">?</div>
+
+
+
+<!-- ═══════════════════════════════════════════════
+     JAVASCRIPT
+     NAVIGATION MAP:
+       ferosa-home.html  → Homepage
+       schedule.html     → This page (Schedule Service)
+       ferosa-auth.html  → Login / Sign Up
+═══════════════════════════════════════════════ -->
+<script>
+  // ── Mobile menu ──
+  document.querySelectorAll('#mobile-menu a').forEach(a =>
+    a.addEventListener('click', () => document.getElementById('mobile-menu').classList.remove('open'))
+  );
+
+  // ═══════════════════════════════════════════
+  // CONSTANTS & STATE
+  // ═══════════════════════════════════════════
+  const MONTHS     = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DAY_NAMES  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const TIME_SLOTS = ['8:00 AM','9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM','5:00 PM'];
+  const MAX_SLOTS  = 10;
+
+  // Today (midnight) — blocks past dates
+  const TODAY = new Date();
+  TODAY.setHours(0, 0, 0, 0);
+
+  let calYear  = TODAY.getFullYear();
+  let calMonth = TODAY.getMonth();
+  let selectedDay  = null;
+  let selectedTime = null;
+
+  // Booking store: key "Y-M-D" → number of bookings made
+  const bookings = {};
+  const getKey      = (y, m, d) => `${y}-${m}-${d}`;
+  const getBooked   = (y, m, d) => bookings[getKey(y, m, d)] || 0;
+  const getSlotsLeft = (y, m, d) => MAX_SLOTS - getBooked(y, m, d);
+
+  // Seed some demo bookings in the next 14 days
+  (function seedDemo() {
+    for (let i = 1; i <= 14; i++) {
+      const d = new Date(TODAY);
+      d.setDate(TODAY.getDate() + i);
+      const k = getKey(d.getFullYear(), d.getMonth(), d.getDate());
+      if (i % 7 === 0)      bookings[k] = 10; // fully booked
+      else if (i % 3 === 0) bookings[k] = 7;  // limited (3 left)
+    }
+  })();
+
+  // ═══════════════════════════════════════════
+  // CALENDAR
+  // ═══════════════════════════════════════════
+  function renderCalendar() {
+    const grid  = document.getElementById('cal-grid');
+    const label = document.getElementById('month-label');
+    label.textContent = `${MONTHS[calMonth]} ${calYear}`;
+    grid.innerHTML = '';
+
+    const firstWeekday = new Date(calYear, calMonth, 1).getDay();
+    const daysInMonth  = new Date(calYear, calMonth + 1, 0).getDate();
+
+    // Leading empty cells
+    for (let i = 0; i < firstWeekday; i++) {
+      grid.insertAdjacentHTML('beforeend', '<div class="h-16"></div>');
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const thisDate = new Date(calYear, calMonth, d);
+      thisDate.setHours(0, 0, 0, 0);
+
+      const isPast       = thisDate < TODAY;
+      const isToday      = thisDate.getTime() === TODAY.getTime();
+      const slotsLeft    = getSlotsLeft(calYear, calMonth, d);
+      const isFull       = slotsLeft <= 0;
+      const isLimited    = !isFull && slotsLeft <= 3;
+      const isSelected   = selectedDay === d;
+      const isClickable  = !isPast && !isFull;
+
+      const cell = document.createElement('div');
+      cell.className = 'h-16 flex flex-col items-center justify-start pt-1';
+
+      const btn = document.createElement('button');
+      btn.textContent = d;
+
+      let cls = 'cal-day';
+      if (isPast)       cls += ' past';
+      else if (isSelected) cls += ' selected';
+      else if (isToday) cls += ' today';
+      else if (isFull)  cls += ' booked';
+      else if (isLimited) cls += ' limited';
+      btn.className = cls;
+      btn.disabled = !isClickable;
+
+      if (isClickable) btn.addEventListener('click', () => selectDay(d, btn));
+
+      const slotLabel = document.createElement('span');
+      slotLabel.className = 'text-[10px] leading-none mt-0.5 font-medium';
+      if (isPast) {
+        slotLabel.textContent = '';
+      } else if (isFull) {
+        slotLabel.textContent = 'Full';
+        slotLabel.className += ' text-red-400';
+      } else {
+        slotLabel.textContent = `${slotsLeft} slots`;
+        slotLabel.className += isLimited ? ' text-amber-500' : ' text-green-500';
+      }
+
+      cell.appendChild(btn);
+      cell.appendChild(slotLabel);
+      grid.appendChild(cell);
+    }
+
+    // Disable prev-month btn when already on current month
+    const prevBtn = document.getElementById('prev-month');
+    const isCurrentMonth = calYear === TODAY.getFullYear() && calMonth === TODAY.getMonth();
+    prevBtn.disabled = isCurrentMonth;
+    prevBtn.classList.toggle('opacity-30', isCurrentMonth);
+    prevBtn.classList.toggle('cursor-not-allowed', isCurrentMonth);
+  }
+
+  function selectDay(d, btn) {
+    document.querySelectorAll('.cal-day.selected').forEach(el => el.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedDay  = d;
+    selectedTime = null;
+    document.querySelectorAll('.time-btn.selected').forEach(el => el.classList.remove('selected'));
+
+    const dateObj = new Date(calYear, calMonth, d);
+    document.getElementById('selected-date-label').textContent =
+      `${DAY_NAMES[dateObj.getDay()]}, ${MONTHS[calMonth]} ${d}`;
+
+    renderTimeSlots();
+    updateSummary();
+  }
+
+  document.getElementById('prev-month').addEventListener('click', () => {
+    if (calYear === TODAY.getFullYear() && calMonth === TODAY.getMonth()) return;
+    if (--calMonth < 0) { calMonth = 11; calYear--; }
+    selectedDay = null; selectedTime = null;
+    renderCalendar(); renderTimeSlots(); updateSummary();
+  });
+  document.getElementById('next-month').addEventListener('click', () => {
+    if (++calMonth > 11) { calMonth = 0; calYear++; }
+    selectedDay = null; selectedTime = null;
+    renderCalendar(); renderTimeSlots(); updateSummary();
+  });
+
+  // ═══════════════════════════════════════════
+  // TIME SLOTS
+  // ═══════════════════════════════════════════
+  function renderTimeSlots() {
+    const grid = document.getElementById('time-grid');
+    grid.innerHTML = '';
+
+    if (!selectedDay) {
+      grid.insertAdjacentHTML('beforeend',
+        '<p class="col-span-2 text-center text-gray-400 text-sm py-4">Select a date to see available times</p>');
+      return;
+    }
+
+    const slotsLeft = getSlotsLeft(calYear, calMonth, selectedDay);
+
+    TIME_SLOTS.forEach(time => {
+      const isDisabled = slotsLeft <= 0;
+      const btn = document.createElement('button');
+      btn.className = 'time-btn' + (isDisabled ? ' opacity-40 cursor-not-allowed' : '');
+      btn.disabled  = isDisabled;
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="flex-shrink-0 text-gray-400"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${time}`;
+      if (!isDisabled) btn.addEventListener('click', () => selectTime(time, btn));
+      grid.appendChild(btn);
+    });
+  }
+
+  function selectTime(time, btn) {
+    document.querySelectorAll('.time-btn.selected').forEach(el => el.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedTime = time;
+    updateSummary();
+  }
+
+  // ═══════════════════════════════════════════
+  // BOOKING SUMMARY
+  // ═══════════════════════════════════════════
+  function updateSummary() {
+    const service = document.getElementById('service-select').value;
+
+    if (selectedDay) {
+      const dateObj = new Date(calYear, calMonth, selectedDay);
+      document.getElementById('summary-date').textContent =
+        `${DAY_NAMES[dateObj.getDay()]}, ${MONTHS[calMonth]} ${selectedDay}, ${calYear}`;
+    } else {
+      document.getElementById('summary-date').textContent = '–';
+    }
+
+    document.getElementById('summary-time').textContent    = selectedTime || '–';
+    document.getElementById('summary-service').textContent = service;
+
+    const slotsEl = document.getElementById('summary-slots');
+    if (selectedDay) {
+      const left = getSlotsLeft(calYear, calMonth, selectedDay);
+      if (left <= 0) {
+        slotsEl.textContent = 'Fully Booked';
+        slotsEl.className   = 'text-sm font-semibold text-red-500';
+      } else if (left <= 3) {
+        slotsEl.textContent = `${left} slots left (Limited)`;
+        slotsEl.className   = 'text-sm font-semibold text-amber-600';
+      } else {
+        slotsEl.textContent = `${left} of ${MAX_SLOTS} slots remaining`;
+        slotsEl.className   = 'text-sm font-semibold text-green-600';
+      }
+    } else {
+      slotsEl.textContent = 'Select a date to check';
+      slotsEl.className   = 'text-sm font-semibold text-gray-500';
+    }
+  }
+
+  // ═══════════════════════════════════════════
+  // CONFIRMATION MODAL
+  // ═══════════════════════════════════════════
+  function showModal(type) {
+    const backdrop = document.getElementById('modal-backdrop');
+    const box      = document.getElementById('modal-box');
+    const iconWrap = document.getElementById('modal-icon-wrap');
+    const titleEl  = document.getElementById('modal-title');
+    const msgEl    = document.getElementById('modal-msg');
+    const badges   = document.getElementById('modal-badges');
+    const closeBtn = document.getElementById('modal-close-btn');
+
+    // Reset close button
+    closeBtn.style.background = '';
+    closeBtn.style.boxShadow  = '';
+
+    if (type === 'confirming') {
+      iconWrap.className = 'w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-5';
+      iconWrap.innerHTML = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+      titleEl.textContent    = 'Confirming...';
+      msgEl.textContent      = 'Processing your booking request';
+      badges.style.display   = 'none';
+      closeBtn.style.display = 'none';
+
+    } else if (type === 'success') {
+      iconWrap.className = 'w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-5';
+      iconWrap.innerHTML = `<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+      titleEl.textContent    = 'Booking Confirmed!';
+      msgEl.textContent      = 'A confirmation has been sent to your email and phone.';
+      badges.style.display   = 'flex';
+      closeBtn.style.display = 'flex';
+
+    } else if (type === 'error') {
+      iconWrap.className = 'w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-5';
+      iconWrap.innerHTML = `<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+      titleEl.textContent    = 'No Slots Available';
+      msgEl.textContent      = 'Sorry, this date is now fully booked. Please choose another date or time.';
+      badges.style.display   = 'none';
+      closeBtn.style.display = 'flex';
+      closeBtn.style.background = '#dc2626';
+      closeBtn.style.boxShadow  = '0 4px 20px rgba(220,38,38,0.35)';
+    }
+
+    backdrop.style.display = 'flex';
+    box.style.animation = 'none';
+    requestAnimationFrame(() => {
+      box.style.animation = 'modalIn 0.4s cubic-bezier(0.22,1,0.36,1) both';
+    });
+  }
+
+  function closeModal() {
+    const backdrop = document.getElementById('modal-backdrop');
+    const box      = document.getElementById('modal-box');
+    box.style.animation = 'modalOut 0.28s ease forwards';
+    setTimeout(() => { backdrop.style.display = 'none'; }, 260);
+  }
+  document.getElementById('modal-backdrop').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // ═══════════════════════════════════════════
+  // BOOK NOW
+  // ═══════════════════════════════════════════
+  function handleBookNow() {
+    if (!selectedDay)  { showToast('⚠️ Please select a date first', 'error'); return; }
+    if (!selectedTime) { showToast('⚠️ Please select a time slot', 'error'); return; }
+
+    if (getSlotsLeft(calYear, calMonth, selectedDay) <= 0) {
+      showModal('error'); return;
+    }
+
+    showModal('confirming');
+
+    setTimeout(() => {
+      // Record booking
+      const k = getKey(calYear, calMonth, selectedDay);
+      bookings[k] = (bookings[k] || 0) + 1;
+
+      // Refresh calendar + summary
+      renderCalendar();
+      updateSummary();
+
+      showModal('success');
+
+      // Reset time selection
+      selectedTime = null;
+      document.querySelectorAll('.time-btn.selected').forEach(el => el.classList.remove('selected'));
+    }, 1500);
+  }
+
+  // ═══════════════════════════════════════════
+  // TOAST
+  // ═══════════════════════════════════════════
+  let toastTimer = null;
+  function showToast(msg, type = 'default', duration = 3000) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.background = type === 'success' ? '#15803d' : type === 'error' ? '#dc2626' : '#111827';
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), duration);
+  }
+
+  // ═══════════════════════════════════════════
+  // MODAL ANIMATIONS (injected)
+  // ═══════════════════════════════════════════
+  document.head.insertAdjacentHTML('beforeend', `<style>
+    @keyframes modalIn  { from{opacity:0;transform:scale(0.88) translateY(20px)} to{opacity:1;transform:scale(1) translateY(0)} }
+    @keyframes modalOut { from{opacity:1;transform:scale(1)} to{opacity:0;transform:scale(0.92)} }
+    .cal-day.past { color:#d1d5db; cursor:not-allowed; }
+    .cal-day.past:hover { background:transparent; color:#d1d5db; }
+  </style>`);
+
+  // ═══════════════════════════════════════════
+  // INIT
+  // ═══════════════════════════════════════════
+  renderCalendar();
+  renderTimeSlots();
+  updateSummary();
+</script>
+</body>
+</html>

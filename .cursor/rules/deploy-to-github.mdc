@@ -1,0 +1,76 @@
+---
+description: Deployment workflow from Cursor to the GitHub repository arden-landscaping-management-system
+alwaysApply: true
+---
+
+# Deployment Rule – Push from Cursor to GitHub
+
+Use this deployment workflow whenever changes in this project are ready to be pushed from Cursor to GitHub.
+
+## Repository
+
+- **Remote repository URL**: `https://github.com/maitomioka/arden-landscaping-management-system.git`
+- **Expected remote name**: `origin`
+- **Primary branch**: `main` (create it if it does not exist yet)
+
+## Deployment Steps (from Cursor)
+
+1. **Verify git status**
+   - Run: `git status`
+   - Ensure only the intended files are modified (e.g., `ferosa-auth.html`, `ferosa-home.html`, `schedule.html`, and related assets).
+
+2. **Add and commit changes**
+   - Stage files:
+     - To stage everything: `git add .`
+     - Or stage specific files, for example:
+       - `git add ferosa-auth.html ferosa-home.html schedule.html`
+   - Commit with a clear message, e.g.:
+     - `git commit -m "Update Ferosa pages and schedule"`
+   - Commit messages should:
+     - Be in the **imperative mood** (e.g., "Add schedule page", "Fix auth layout").
+     - Explain the **purpose** of the change, not every detail.
+
+3. **Configure the remote (one-time per machine)**
+   - Check remotes:
+     - `git remote -v`
+   - If `origin` is missing or incorrect, set it to this repo:
+     - `git remote remove origin` (only if an incorrect origin already exists)
+     - `git remote add origin https://github.com/maitomioka/arden-landscaping-management-system.git`
+
+4. **Choose or confirm the main branch**
+   - Check the current branch:
+     - `git branch`
+   - If there is no `main` branch yet:
+     - Rename current branch to `main`:
+       - `git branch -M main`
+   - Otherwise, make sure new work is based on the correct branch (typically `main`).
+
+5. **Push changes to GitHub**
+   - Initial push (sets upstream):
+     - `git push -u origin main`
+   - Subsequent pushes:
+     - `git push`
+
+6. **Authentication**
+   - Use GitHub authentication as configured on this machine:
+     - Prefer **GitHub CLI** or **personal access token** if HTTPS pushes request credentials.
+   - Do **not** commit credentials, tokens, or secrets into the repository.
+
+7. **Post-push verification**
+   - Open the GitHub repository in a browser:
+     - `https://github.com/maitomioka/arden-landscaping-management-system`
+   - Confirm:
+     - Latest commit appears on `main`.
+     - Changed files (`ferosa-auth.html`, `ferosa-home.html`, `schedule.html`, etc.) are updated as expected.
+
+## Assistant-Specific Guidance
+
+- When the user asks to **deploy** or **push** changes:
+  - Follow the steps above using terminal commands from Cursor.
+  - Never run destructive git commands such as `git push --force` unless the user **explicitly** requests it and understands the risk.
+  - Prefer creating new commits over rewriting history.
+  - Clearly summarize:
+    - Which files were committed.
+    - The branch and remote used.
+    - The resulting GitHub URL for the commit or branch.
+
